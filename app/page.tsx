@@ -10,6 +10,7 @@ import { BedsNeedChart } from "@/components/charts/BedsNeedChart";
 import { NetworkTrend } from "@/components/charts/NetworkTrend";
 import { SiteSection } from "@/components/sections/SiteSection";
 import { CompareSection } from "@/components/sections/CompareSection";
+import { YourData } from "@/components/sections/YourData";
 import { DataSection } from "@/components/sections/DataSection";
 import { formatEuroCompact, formatInt } from "@/lib/format";
 
@@ -44,6 +45,10 @@ export default async function HomePage() {
 
   return (
     <div className="space-y-12">
+      <Section id="input" title="Enter your data" subtitle="Insert a site’s numbers and get the benchmark comparison, recommendation and scenarios straight away.">
+        <YourData benchmark={benchmark} settings={settings} scenario={DEFAULT_SCENARIO} />
+      </Section>
+
       <Section id="network" title="The perfect hospital, as your yardstick" subtitle="Every site against one benchmark hospital — so the real need is visible before a decision about a site’s role is made.">
         <div className="grid gap-4 sm:grid-cols-3">
           <Kpi label="Average vs. benchmark" value={`${formatInt(avg)}%`} hint={`${sites.length} sites · mean of all`} tone={avg >= 90 ? "good" : avg >= 75 ? "warn" : "bad"} />
