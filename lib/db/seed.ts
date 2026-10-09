@@ -1,4 +1,5 @@
-import type Database from "better-sqlite3";
+import type { DatabaseSync } from "node:sqlite";
+import { transaction } from "./client";
 import { DEFAULT_BENCHMARK, DEFAULT_SETTINGS, METRIC_BY_KEY, SCORED_KEYS } from "../domain/metrics";
 import type { ScoredKey, Snapshot } from "../domain/types";
 
@@ -50,7 +51,7 @@ function historyFor(site: DemoSite, siteIndex: number): Snapshot[] {
   });
 }
 
-export function seedDemoData(db: Database.Database): void {
+export function seedDemoData(db: DatabaseSync): void {
   const insertSite = db.prepare("INSERT INTO sites (slug, name, region, kind) VALUES (?, ?, ?, ?)");
   const insertSnap = db.prepare(
     `INSERT INTO site_snapshots (site_id, period, beds, occupancy, area_per_bed, cost_per_m2, or_util, space_use, energy, travel_time, source)
@@ -63,7 +64,7 @@ export function seedDemoData(db: Database.Database): void {
   const upsertSetting = db.prepare(`INSERT INTO settings (key, value) VALUES (?, ?) ON CONFLICT(key) DO NOTHING`);
   const setMeta = db.prepare(`INSERT INTO meta (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value`);
 
-  db.transaction(() => {
+  transaction(db, () => {
     DEMO_SITES.forEach((site, i) => {
       const { lastInsertRowid } = insertSite.run(site.slug, site.name, site.region, site.kind);
       for (const h of historyFor(site, i)) {
@@ -73,5 +74,5 @@ export function seedDemoData(db: Database.Database): void {
     for (const [k, v] of Object.entries(DEFAULT_BENCHMARK)) upsertBench.run(k, v);
     for (const [k, v] of Object.entries(DEFAULT_SETTINGS)) upsertSetting.run(k, v);
     setMeta.run("data_origin", "demo");
-  })();
+  });
 }

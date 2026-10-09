@@ -6,7 +6,7 @@
 // Percentages are 0–100. Existing (site, period) rows are updated; --replace wipes all sites first
 // (use it to get rid of the demo data).
 import fs from "node:fs";
-import { openDb, DB_PATH } from "../lib/db/client";
+import { openDb, transaction, DB_PATH } from "../lib/db/client";
 import { parseCsv } from "../lib/csv";
 
 const REQUIRED = ["site_slug", "site_name", "period", "beds", "occupancy", "area_per_bed", "cost_per_m2", "or_util", "space_use", "energy", "travel_time"];
@@ -70,14 +70,17 @@ const upsertSnap = db.prepare(
      source = 'csv', imported_at = datetime('now')`,
 );
 
-db.transaction(() => {
+transaction(db, () => {
   if (replace) db.exec("DELETE FROM site_snapshots; DELETE FROM sites;");
   for (const rec of records) {
-    upsertSite.run(rec);
+    upsertSite.run({ slug: rec.slug, name: rec.name, region: rec.region, kind: rec.kind });
     const { id } = siteId.get(rec.slug) as { id: number };
-    upsertSnap.run({ ...rec, siteId: id });
+    upsertSnap.run({
+      siteId: id, period: rec.period, beds: rec.beds, occupancy: rec.occupancy, areaPerBed: rec.areaPerBed, costPerM2: rec.costPerM2,
+      orUtil: rec.orUtil, spaceUse: rec.spaceUse, energy: rec.energy, travelTime: rec.travelTime,
+    });
   }
   db.prepare("INSERT INTO meta (key, value) VALUES ('data_origin', 'imported') ON CONFLICT(key) DO UPDATE SET value = 'imported'").run();
-})();
+});
 
 console.log(`Imported ${records.length} rows into ${DB_PATH}${replace ? " (existing sites replaced)" : ""}.`);

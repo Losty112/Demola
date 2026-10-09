@@ -2,7 +2,7 @@
 
 A comparable view of every hospital site against a benchmark hospital, so hospital directors see the real need before a decision about a site's role is made. Prototype with illustrative demo data.
 
-**Stack:** Next.js 16 (App Router), React 19, Tailwind 4, Recharts, SQLite (better-sqlite3).
+**Stack:** Next.js 16 (App Router), React 19, Tailwind 4, Recharts, SQLite (built-in `node:sqlite`, Node 22+).
 
 ## Run
 
