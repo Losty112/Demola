@@ -1,0 +1,14 @@
+# Render Blueprint: New + > Blueprint, pick this repo. Persistent disks need a paid instance type.
+services:
+  - type: web
+    name: benchmark-hospital
+    runtime: docker
+    plan: starter
+    healthCheckPath: /
+    envVars:
+      - key: BENCHMARK_DB_PATH
+        value: /data/benchmark.db
+    disk:
+      name: data
+      mountPath: /data
+      sizeGB: 1

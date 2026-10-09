@@ -100,3 +100,29 @@ export async function getNetwork(scenario: ScenarioInput = DEFAULT_SCENARIO): Pr
   const periods = [...new Set(sites.flatMap((s) => s.history.map((h) => h.period)))].sort();
   return { sites: enriched, benchmark, settings, periods };
 }
+
+export interface SiteInput { name: string; region?: string; kind?: string; snapshot: Snapshot }
+
+/** Upserts one site and one period of data entered by a user (same shape the CSV import writes). */
+export function saveSiteSnapshot(input: SiteInput): string {
+  const db = getDb();
+  const slug = input.name.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "site";
+  const s = input.snapshot;
+  db.transaction(() => {
+    db.prepare(
+      `INSERT INTO sites (slug, name, region, kind) VALUES (?, ?, ?, ?)
+       ON CONFLICT(slug) DO UPDATE SET name = excluded.name, region = excluded.region, kind = excluded.kind`,
+    ).run(slug, input.name.trim(), input.region?.trim() || "—", input.kind?.trim() || "Hospital");
+    const { id } = db.prepare("SELECT id FROM sites WHERE slug = ?").get(slug) as { id: number };
+    db.prepare(
+      `INSERT INTO site_snapshots (site_id, period, beds, occupancy, area_per_bed, cost_per_m2, or_util, space_use, energy, travel_time, source)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'form')
+       ON CONFLICT(site_id, period) DO UPDATE SET beds = excluded.beds, occupancy = excluded.occupancy,
+         area_per_bed = excluded.area_per_bed, cost_per_m2 = excluded.cost_per_m2, or_util = excluded.or_util,
+         space_use = excluded.space_use, energy = excluded.energy, travel_time = excluded.travel_time,
+         source = 'form', imported_at = datetime('now')`,
+    ).run(id, s.period, s.beds, s.occupancy, s.areaPerBed, s.costPerM2, s.orUtil, s.spaceUse, s.energy, s.travelTime);
+    db.prepare("INSERT INTO meta (key, value) VALUES ('data_origin', 'imported') ON CONFLICT(key) DO UPDATE SET value = 'imported'").run();
+  })();
+  return slug;
+}
