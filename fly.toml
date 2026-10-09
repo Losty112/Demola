@@ -1,0 +1,20 @@
+# fly launch --no-deploy --copy-config, then: fly volumes create data --size 1 && fly deploy
+app = "benchmark-hospital"
+primary_region = "ams"
+
+[build]
+
+[env]
+  BENCHMARK_DB_PATH = "/data/benchmark.db"
+  PORT = "3000"
+
+[mounts]
+  source = "data"
+  destination = "/data"
+
+[http_service]
+  internal_port = 3000
+  force_https = true
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 0

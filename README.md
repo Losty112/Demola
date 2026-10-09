@@ -14,6 +14,16 @@ npm test           # domain-logic unit tests
 
 A SQLite database (`data/benchmark.db`) is created and filled with demo data on first start. `npm run db:seed` resets it.
 
+## Deploy (shareable link)
+
+A `Dockerfile` is included; the SQLite file is stored at `/data/benchmark.db`, so mount a persistent volume there or saved data is lost on redeploy.
+
+- **Render:** New → Blueprint → pick this repo (`render.yaml`; the disk needs a paid instance).
+- **Fly.io:** `fly launch --no-deploy --copy-config`, `fly volumes create data --size 1`, `fly deploy` (`fly.toml`).
+- **Railway:** New project → Deploy from repo (uses the Dockerfile), add a volume mounted at `/data`, set `BENCHMARK_DB_PATH=/data/benchmark.db`.
+
+Local check: `docker build -t benchmark-hospital . && docker run -p 3000:3000 -v bh-data:/data benchmark-hospital`
+
 ## Loading real data
 
 1. Fill `data/import-template.csv` — one row per site and quarter.
