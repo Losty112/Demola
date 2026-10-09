@@ -20,6 +20,8 @@ A SQLite database (`data/benchmark.db`) is created and filled with demo data on 
 2. `npm run db:import -- yourfile.csv --replace` (`--replace` removes the demo sites).
 3. Edit benchmark values and decision thresholds in the `benchmark_values` and `settings` tables.
 
+The app is one page (`/`) with four sections: overview, site analysis, compare, benchmark & data. The old `/compare`, `/data` and `/sites/*` URLs redirect to it.
+
 JSON endpoints: `/api/sites`, `/api/sites/[slug]`, `/api/benchmark`.
 
 ## Layout

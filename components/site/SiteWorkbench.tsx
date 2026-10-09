@@ -118,7 +118,9 @@ export function SiteWorkbench({ name, history, benchmark, settings, initialScena
           </Card>
         </div>
 
-        <div className="grid gap-5 xl:grid-cols-2">
+        <details className="group rounded-2xl border border-line bg-surface shadow-card">
+          <summary className="cursor-pointer select-none px-5 py-3 text-sm font-medium text-brand-600 group-open:border-b group-open:border-line">Trends and space need</summary>
+          <div className="grid gap-5 p-5 xl:grid-cols-2">
           <Card title="Trend by metric" subtitle="Reported quarters vs. the benchmark line">
             <MetricTrends history={history} benchmark={benchmark} />
           </Card>
@@ -151,7 +153,8 @@ export function SiteWorkbench({ name, history, benchmark, settings, initialScena
               </p>
             </div>
           </Card>
-        </div>
+          </div>
+        </details>
 
         <Card title="Scenarios: saving vs. access impact" subtitle="Simplified model — a real digital twin would replace these assumptions with live building and patient-flow data">
           <div className="mb-5 grid gap-5 sm:grid-cols-2">
