@@ -1,0 +1,2 @@
+site_slug,site_name,region,kind,period,beds,occupancy,area_per_bed,cost_per_m2,or_util,space_use,energy,travel_time
+example-site,Example Site,North,Central hospital,2026-Q3,320,68,138,315,58,62,290,22
