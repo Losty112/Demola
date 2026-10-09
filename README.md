@@ -2,7 +2,7 @@
 
 A comparable view of every hospital site against a benchmark hospital, so hospital directors see the real need before a decision about a site's role is made. Prototype with illustrative demo data.
 
-**Stack:** Next.js 16 (App Router), React 19, Tailwind 4, Recharts, SQLite (better-sqlite3).
+**Stack:** Next.js 16 (App Router), React 19, Tailwind 4, Recharts, SQLite (built-in `node:sqlite`, Node 22+).
 
 ## Run
 
@@ -21,6 +21,8 @@ A `Dockerfile` is included; the SQLite file is stored at `/data/benchmark.db`, s
 - **Render:** New → Blueprint → pick this repo (`render.yaml`; the disk needs a paid instance).
 - **Fly.io:** `fly launch --no-deploy --copy-config`, `fly volumes create data --size 1`, `fly deploy` (`fly.toml`).
 - **Railway:** New project → Deploy from repo (uses the Dockerfile), add a volume mounted at `/data`, set `BENCHMARK_DB_PATH=/data/benchmark.db`.
+
+- **Vercel (free, no card, demo only):** import the repo at vercel.com/new and deploy. The database lives in `/tmp`, so the demo sites reload on cold starts and saved sites are not permanent.
 
 Local check: `docker build -t benchmark-hospital . && docker run -p 3000:3000 -v bh-data:/data benchmark-hospital`
 
