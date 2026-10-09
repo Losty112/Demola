@@ -8,7 +8,9 @@ declare global {
   var __benchmarkDb: Database.Database | undefined;
 }
 
-export const DB_PATH = process.env.BENCHMARK_DB_PATH ?? path.join(process.cwd(), "data", "benchmark.db");
+// Serverless hosts (Vercel) only allow writes under /tmp; data there is demo-only and resets on cold starts.
+export const DB_PATH = process.env.BENCHMARK_DB_PATH
+  ?? (process.env.VERCEL ? "/tmp/benchmark.db" : path.join(process.cwd(), "data", "benchmark.db"));
 
 export function openDb(file = DB_PATH): Database.Database {
   fs.mkdirSync(path.dirname(file), { recursive: true });

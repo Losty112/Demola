@@ -22,6 +22,8 @@ A `Dockerfile` is included; the SQLite file is stored at `/data/benchmark.db`, s
 - **Fly.io:** `fly launch --no-deploy --copy-config`, `fly volumes create data --size 1`, `fly deploy` (`fly.toml`).
 - **Railway:** New project → Deploy from repo (uses the Dockerfile), add a volume mounted at `/data`, set `BENCHMARK_DB_PATH=/data/benchmark.db`.
 
+- **Vercel (free, no card, demo only):** import the repo at vercel.com/new and deploy. The database lives in `/tmp`, so the demo sites reload on cold starts and saved sites are not permanent.
+
 Local check: `docker build -t benchmark-hospital . && docker run -p 3000:3000 -v bh-data:/data benchmark-hospital`
 
 ## Loading real data
