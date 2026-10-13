@@ -9,9 +9,9 @@ import type { Benchmark, MetricKey, ScenarioInput, Settings, Snapshot } from "@/
 const PERIOD = `${new Date().getFullYear()}-Q${Math.floor(new Date().getMonth() / 3) + 1}`;
 type Values = Record<MetricKey, number>;
 /** Made-up example hospitals so the demo opens with a result; the user can overwrite any number. */
-const EXAMPLES: { name: string; note: string; v: Values }[] = [
+const EXAMPLES: { name: string; note: string; green?: boolean; v: Values }[] = [
   { name: "Riverside General", note: "Under-used, high cost", v: { beds: 420, occupancy: 64, areaPerBed: 148, costPerM2: 318, orUtil: 57, spaceUse: 61, energy: 285, travelTime: 22 } },
-  { name: "Lakeview Clinic", note: "Close to benchmark", v: { beds: 240, occupancy: 83, areaPerBed: 109, costPerM2: 285, orUtil: 78, spaceUse: 84, energy: 228, travelTime: 28 } },
+  { name: "Lakeview Clinic", note: "Close to benchmark", green: true, v: { beds: 240, occupancy: 83, areaPerBed: 109, costPerM2: 285, orUtil: 78, spaceUse: 84, energy: 228, travelTime: 28 } },
   { name: "Hillcrest Rural", note: "Small, remote, costly", v: { beds: 110, occupancy: 52, areaPerBed: 172, costPerM2: 345, orUtil: 41, spaceUse: 55, energy: 340, travelTime: 54 } },
 ];
 const toStrings = (v: Values) => Object.fromEntries(Object.entries(v).map(([k, n]) => [k, String(n)])) as Record<MetricKey, string>;
@@ -45,7 +45,7 @@ export function YourData({ benchmark, settings, scenario }: { benchmark: Benchma
         <div className="mb-4 flex flex-wrap items-center gap-2 text-xs">
           <span className="text-muted">Start from an example:</span>
           {EXAMPLES.map((e) => (
-            <button key={e.name} type="button" onClick={() => load(e)} className="rounded-full bg-white px-3 py-1.5 font-medium text-brand-700 ring-1 ring-brand-200 hover:bg-brand-50">{e.name} <span className="text-muted">· {e.note}</span></button>
+            <button key={e.name} type="button" onClick={() => load(e)} className={`rounded-full px-3 py-1.5 font-medium ring-1 ${e.green ? "bg-par/10 text-par ring-par/40 hover:bg-par/20" : "bg-white text-brand-700 ring-brand-200 hover:bg-brand-50"}`}>{e.name} <span className={e.green ? "text-par/80" : "text-muted"}>· {e.note}</span></button>
           ))}
         </div>
         <form onSubmit={(e) => { e.preventDefault(); if (!invalid && name.trim()) { setSnap(build()); setMsg(null); } }} className="space-y-4">
