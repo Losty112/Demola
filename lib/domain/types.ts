@@ -107,3 +107,49 @@ export interface Recommendation {
   text: string;
   actions: ActionItem[];
 }
+
+/** Detail statistics of one site (not used by the scoring engine, shown next to it). */
+export interface MonthlyActivity {
+  month: string; // "2026-07-01"
+  admissions: number;
+  discharges: number;
+  edVisits: number;
+  surgeries: number;
+  bedDays: number;
+  energyKwh: number;
+}
+
+export interface DepartmentStat {
+  code: string;
+  name: string;
+  period: string;
+  beds: number;
+  occupancy: number;
+  avgLosDays: number;
+  admissions: number;
+  bedDays: number;
+  nurseFte: number;
+  physicianFte: number;
+}
+
+export interface OperatingRoomStat {
+  period: string;
+  rooms: number;
+  availableHours: number;
+  usedHours: number;
+  cases: number;
+  cancellationPct: number;
+  turnoverMin: number;
+  firstCaseOntimePct: number;
+}
+
+export interface CostLine { period: string; category: string; amountEur: number }
+export interface PatientFlow { year: number; municipality: string; patients: number; avgTravelMin: number }
+
+export interface SiteStats {
+  monthly: MonthlyActivity[]; // oldest -> newest
+  departments: DepartmentStat[]; // every department, every period
+  operatingRooms: OperatingRoomStat[]; // oldest -> newest
+  costs: CostLine[];
+  flows: PatientFlow[];
+}

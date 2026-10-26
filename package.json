@@ -9,10 +9,12 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "test": "tsx --test tests/*.test.ts",
-    "db:seed": "tsx scripts/seed.ts",
-    "db:import": "tsx scripts/import-csv.ts"
+    "db:seed": "tsx --env-file-if-exists=.env.local scripts/seed.ts",
+    "db:import": "tsx --env-file-if-exists=.env.local scripts/import-csv.ts",
+    "db:sql": "tsx scripts/generate-seed-sql.ts"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.118.0",
     "next": "16.2.11",
     "react": "19.2.4",
     "react-dom": "19.2.4",

@@ -6,7 +6,7 @@
 // Percentages are 0–100. Existing (site, period) rows are updated; --replace wipes all sites first
 // (use it to get rid of the demo data).
 import fs from "node:fs";
-import { openDb, transaction, DB_PATH } from "../lib/db/client";
+import { getSupabase, unwrap } from "../lib/db/client";
 import { parseCsv } from "../lib/csv";
 
 const REQUIRED = ["site_slug", "site_name", "period", "beds", "occupancy", "area_per_bed", "cost_per_m2", "or_util", "space_use", "energy", "travel_time"];
@@ -55,32 +55,22 @@ if (errors.length) {
   process.exit(1);
 }
 
-const db = openDb();
-const upsertSite = db.prepare(
-  `INSERT INTO sites (slug, name, region, kind) VALUES (@slug, @name, @region, @kind)
-   ON CONFLICT(slug) DO UPDATE SET name = excluded.name, region = excluded.region, kind = excluded.kind`,
-);
-const siteId = db.prepare("SELECT id FROM sites WHERE slug = ?");
-const upsertSnap = db.prepare(
-  `INSERT INTO site_snapshots (site_id, period, beds, occupancy, area_per_bed, cost_per_m2, or_util, space_use, energy, travel_time, source)
-   VALUES (@siteId, @period, @beds, @occupancy, @areaPerBed, @costPerM2, @orUtil, @spaceUse, @energy, @travelTime, 'csv')
-   ON CONFLICT(site_id, period) DO UPDATE SET beds = excluded.beds, occupancy = excluded.occupancy,
-     area_per_bed = excluded.area_per_bed, cost_per_m2 = excluded.cost_per_m2, or_util = excluded.or_util,
-     space_use = excluded.space_use, energy = excluded.energy, travel_time = excluded.travel_time,
-     source = 'csv', imported_at = datetime('now')`,
-);
+const db = getSupabase();
+if (replace) {
+  // sites cascade to snapshots and all detail tables
+  unwrap(await db.from("sites").delete().not("id", "is", null).select("id"), "removing existing sites");
+}
+const sites = [...new Map(records.map((r) => [r.slug, { slug: r.slug, name: r.name, region: r.region, kind: r.kind }])).values()];
+const saved = unwrap(await db.from("sites").upsert(sites, { onConflict: "slug" }).select("id, slug"), "saving sites") as { id: number; slug: string }[];
+const idBySlug = new Map(saved.map((s) => [s.slug, s.id]));
+const snapshots = records.map((rec) => ({
+  site_id: idBySlug.get(rec.slug), period: rec.period, beds: rec.beds, occupancy: rec.occupancy, area_per_bed: rec.areaPerBed,
+  cost_per_m2: rec.costPerM2, or_util: rec.orUtil, space_use: rec.spaceUse, energy: rec.energy, travel_time: rec.travelTime,
+  source: "csv", imported_at: new Date().toISOString(),
+}));
+for (let i = 0; i < snapshots.length; i += 500) {
+  unwrap(await db.from("site_snapshots").upsert(snapshots.slice(i, i + 500), { onConflict: "site_id,period" }).select("id"), "saving snapshots");
+}
+unwrap(await db.from("meta").upsert({ key: "data_origin", value: "imported" }, { onConflict: "key" }).select("key"), "saving data origin");
 
-transaction(db, () => {
-  if (replace) db.exec("DELETE FROM site_snapshots; DELETE FROM sites;");
-  for (const rec of records) {
-    upsertSite.run({ slug: rec.slug, name: rec.name, region: rec.region, kind: rec.kind });
-    const { id } = siteId.get(rec.slug) as { id: number };
-    upsertSnap.run({
-      siteId: id, period: rec.period, beds: rec.beds, occupancy: rec.occupancy, areaPerBed: rec.areaPerBed, costPerM2: rec.costPerM2,
-      orUtil: rec.orUtil, spaceUse: rec.spaceUse, energy: rec.energy, travelTime: rec.travelTime,
-    });
-  }
-  db.prepare("INSERT INTO meta (key, value) VALUES ('data_origin', 'imported') ON CONFLICT(key) DO UPDATE SET value = 'imported'").run();
-});
-
-console.log(`Imported ${records.length} rows into ${DB_PATH}${replace ? " (existing sites replaced)" : ""}.`);
+console.log(`Imported ${records.length} rows into Supabase${replace ? " (existing sites replaced)" : ""}.`);
