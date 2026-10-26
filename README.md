@@ -2,45 +2,46 @@
 
 A comparable view of every hospital site against a benchmark hospital, so hospital directors see the real need before a decision about a site's role is made. Prototype with illustrative demo data.
 
-**Stack:** Next.js 16 (App Router), React 19, Tailwind 4, Recharts, SQLite (built-in `node:sqlite`, Node 22+).
+**Stack:** Next.js 16 (App Router), React 19, Tailwind 4, Recharts, Supabase (Postgres).
 
-## Run
+## Set up
+
+1. **Supabase:** create a project, open *SQL Editor* and run, in this order,
+   `supabase/migrations/20261026000000_init.sql` (schema) and `supabase/seed.sql` (synthetic data: 18 sites × 12 quarters plus departments, monthly activity, operating rooms, cost split and patient catchment). Both are safe to re-run; `seed.sql` resets the data to the demo set.
+2. **Keys:** *Project Settings → API* → copy the project URL and the `service_role` key into `.env.local` (see `.env.example`): `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`. The key is server-only; row level security is on with no policies, so the public anon key can read nothing.
+3. **Run:**
 
 ```bash
 npm install
 npm run dev        # http://localhost:3000
-npm test           # domain-logic unit tests
+npm test           # domain logic + dataset consistency tests
 ```
 
-A SQLite database (`data/benchmark.db`) is created and filled with demo data on first start. `npm run db:seed` resets it.
+## Deploy on Vercel
 
-## Deploy (shareable link)
+Import the repo at vercel.com/new, then add the Supabase integration (Storage → Supabase) or set `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` under *Settings → Environment Variables*. Redeploy. Data lives in Supabase, so saved sites persist.
 
-A `Dockerfile` is included; the SQLite file is stored at `/data/benchmark.db`, so mount a persistent volume there or saved data is lost on redeploy.
+## Data
 
-- **Render:** New → Blueprint → pick this repo (`render.yaml`; the disk needs a paid instance).
-- **Fly.io:** `fly launch --no-deploy --copy-config`, `fly volumes create data --size 1`, `fly deploy` (`fly.toml`).
-- **Railway:** New project → Deploy from repo (uses the Dockerfile), add a volume mounted at `/data`, set `BENCHMARK_DB_PATH=/data/benchmark.db`.
-
-- **Vercel (free, no card, demo only):** import the repo at vercel.com/new and deploy. The database lives in `/tmp`, so the demo sites reload on cold starts and saved sites are not permanent.
-
-Local check: `docker build -t benchmark-hospital . && docker run -p 3000:3000 -v bh-data:/data benchmark-hospital`
+- `npm run db:sql` regenerates `supabase/seed.sql` from `lib/demo/generate.ts` (deterministic; edit the site profiles there to change the demo network).
+- `npm run db:seed` loads the same data through the API instead (needs the keys in `.env.local`).
+- Detail tables reconcile with the quarterly snapshot: department beds add up to the site's beds, monthly bed-days to the quarter's occupancy, cost categories to facility cost × floor area.
 
 ## Loading real data
 
 1. Fill `data/import-template.csv` — one row per site and quarter.
-2. `npm run db:import -- yourfile.csv --replace` (`--replace` removes the demo sites).
-3. Edit benchmark values and decision thresholds in the `benchmark_values` and `settings` tables.
+2. `npm run db:import -- yourfile.csv --replace` (`--replace` removes the demo sites and their detail data).
+3. Edit benchmark values and decision thresholds in the `benchmark_values` and `settings` tables (Supabase *Table Editor*).
 
 The app is one page (`/`) with four sections: overview, site analysis, compare, benchmark & data. The old `/compare`, `/data` and `/sites/*` URLs redirect to it.
 
-JSON endpoints: `/api/sites`, `/api/sites/[slug]`, `/api/benchmark`.
+JSON endpoints: `/api/sites`, `/api/sites/[slug]`, `/api/sites/[slug]/stats`, `/api/benchmark`.
 
 ## Layout
 
 - `lib/domain/` — pure scoring, scenarios and recommendation logic (shared by server and browser)
-- `lib/db/` — schema, client, demo seed, repository
+- `lib/db/` — Supabase client and repository; `lib/demo/` — synthetic dataset generator; `supabase/` — schema and seed SQL
 - `app/` — pages and API routes; `components/` — UI and charts
-- `scripts/` — seed and CSV import; `tests/` — unit tests
+- `scripts/` — seed, SQL generation and CSV import; `tests/` — unit tests
 
 > Next.js 16 has breaking changes vs. older versions (async `params`/`searchParams`, request-time rendering rules); see `AGENTS.md`.

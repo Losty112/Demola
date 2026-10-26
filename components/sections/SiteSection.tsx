@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { SiteWorkbench } from "@/components/site/SiteWorkbench";
+import { SiteStats } from "@/components/site/SiteStats";
 import type { NetworkSite } from "@/lib/db/repository";
 import type { Benchmark, ScenarioInput, Settings } from "@/lib/domain/types";
 
@@ -25,6 +26,7 @@ export function SiteSection({ sites, benchmark, settings, scenario }: {
         <p className="text-sm text-muted">{site.name} · {site.kind} · {site.region} region</p>
       </div>
       <SiteWorkbench key={site.slug} name={site.name} history={site.history} benchmark={benchmark} settings={settings} initialScenario={scenario} />
+      <SiteStats key={site.slug} slug={site.slug} />
     </div>
   );
 }

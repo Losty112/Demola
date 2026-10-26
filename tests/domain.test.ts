@@ -4,7 +4,7 @@ import { analyse, scoreValue, statusOf } from "../lib/domain/scoring";
 import { recommend } from "../lib/domain/recommendation";
 import { runScenarios } from "../lib/domain/scenarios";
 import { DEFAULT_BENCHMARK, DEFAULT_SETTINGS } from "../lib/domain/metrics";
-import { DEMO_SITES } from "../lib/db/seed";
+import { DEMO_PERIODS, DEMO_SITES, generateDemoDataset } from "../lib/demo/generate";
 import { parseCsv } from "../lib/csv";
 import type { Snapshot } from "../lib/domain/types";
 
@@ -66,4 +66,27 @@ test("every metric appears once in the action list, weakest first", () => {
 
 test("csv parser handles quotes and CRLF", () => {
   assert.deepEqual(parseCsv('a,b\r\n"x, y","he said ""hi"""\r\n'), [["a", "b"], ["x, y", 'he said "hi"']]);
+});
+
+test("synthetic dataset reconciles with the site snapshots", () => {
+  const d = generateDemoDataset();
+  assert.equal(d.sites.length, DEMO_SITES.length);
+  assert.equal(d.site_snapshots.length, DEMO_SITES.length * DEMO_PERIODS.length);
+  for (const s of d.site_snapshots) {
+    const sid = s.site_id as number, period = s.period as string;
+    const depts = d.departments.filter((x) => x.site_id === sid).map((x) => x.id);
+    const ds = d.department_snapshots.filter((x) => depts.includes(x.department_id as number) && x.period === period);
+    assert.equal(ds.reduce((n, x) => n + (x.beds as number), 0), s.beds, "department beds add up to site beds");
+    const bedDays = ds.reduce((n, x) => n + (x.bed_days as number), 0);
+    assert.ok(Math.abs(bedDays / ((s.beds as number) * 91) * 100 - (s.occupancy as number)) < 3, "bed-days match occupancy");
+    const cost = d.cost_breakdown.filter((x) => x.site_id === sid && x.period === period).reduce((n, x) => n + (x.amount_eur as number), 0);
+    const expected = ((s.cost_per_m2 as number) * (s.beds as number) * (s.area_per_bed as number)) / 4;
+    assert.ok(Math.abs(cost - expected) <= 1, "cost categories add up to facility cost");
+  }
+  // latest quarter is exactly the brief's numbers
+  const a = d.site_snapshots.find((x) => x.site_id === 1 && x.period === "2026-Q3")!;
+  assert.equal(a.occupancy, 68);
+  assert.equal(a.beds, 320);
+  // deterministic
+  assert.deepEqual(generateDemoDataset().monthly_activity.slice(0, 5), d.monthly_activity.slice(0, 5));
 });

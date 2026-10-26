@@ -25,6 +25,6 @@ export async function POST(req: Request) {
     if (typeof v !== "number" || !Number.isFinite(v) || v < 0) return NextResponse.json({ error: `${m.label} must be a positive number` }, { status: 400 });
     if (m.unit === "%" && v > 100) return NextResponse.json({ error: `${m.label} must be 0–100` }, { status: 400 });
   }
-  const slug = saveSiteSnapshot({ name, region: body.region, kind: body.kind, snapshot: snap as Snapshot });
+  const slug = await saveSiteSnapshot({ name, region: body.region, kind: body.kind, snapshot: snap as Snapshot });
   return NextResponse.json({ slug });
 }
