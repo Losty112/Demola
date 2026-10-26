@@ -7,7 +7,7 @@ A comparable view of every hospital site against a benchmark hospital, so hospit
 ## Set up
 
 1. **Supabase:** create a project, open *SQL Editor* and run, in this order,
-   `supabase/migrations/20261026000000_init.sql` (schema) and `supabase/seed.sql` (synthetic data: 18 sites × 12 quarters plus departments, monthly activity, operating rooms, cost split and patient catchment). Both are safe to re-run; `seed.sql` resets the data to the demo set.
+   `supabase/migrations/20261026000000_init.sql` (schema) and `supabase/seed.sql` (illustrative Prague data: 9 hospitals × 12 quarters plus departments, monthly activity, operating rooms, cost split and patient catchment). Both are safe to re-run; `seed.sql` resets the data to the demo set.
 2. **Keys:** *Project Settings → API* → copy the project URL and the `service_role` key into `.env.local` (see `.env.example`): `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`. The key is server-only; row level security is on with no policies, so the public anon key can read nothing.
 3. **Run:**
 

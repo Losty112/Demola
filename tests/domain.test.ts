@@ -3,14 +3,15 @@ import assert from "node:assert/strict";
 import { analyse, scoreValue, statusOf } from "../lib/domain/scoring";
 import { recommend } from "../lib/domain/recommendation";
 import { runScenarios } from "../lib/domain/scenarios";
-import { DEFAULT_BENCHMARK, DEFAULT_SETTINGS } from "../lib/domain/metrics";
+import { DEFAULT_SETTINGS } from "../lib/domain/metrics";
 import { DEMO_PERIODS, DEMO_SITES, generateDemoDataset } from "../lib/demo/generate";
 import { parseCsv } from "../lib/csv";
 import type { Snapshot } from "../lib/domain/types";
 
-const snap = (s: (typeof DEMO_SITES)[number]): Snapshot => ({ period: "2026-Q3", ...s.latest });
-const A = snap(DEMO_SITES[0]);
-const C = snap(DEMO_SITES[2]);
+// Fixed fixtures from the project brief, independent of the demo network and of the default benchmark.
+const DEFAULT_BENCHMARK = { occupancy: 85, areaPerBed: 105, costPerM2: 280, orUtil: 80, spaceUse: 85, energy: 220, travelTime: 30 };
+const A: Snapshot = { period: "2026-Q3", beds: 320, occupancy: 68, areaPerBed: 138, costPerM2: 315, orUtil: 58, spaceUse: 62, energy: 290, travelTime: 22 };
+const C: Snapshot = { period: "2026-Q3", beds: 140, occupancy: 55, areaPerBed: 165, costPerM2: 340, orUtil: 41, spaceUse: 54, energy: 310, travelTime: 48 };
 const scenario = { sharePct: 15, extraTravelMin: 25 };
 
 test("scores: higher-better and lower-better, capped", () => {
@@ -83,10 +84,10 @@ test("synthetic dataset reconciles with the site snapshots", () => {
     const expected = ((s.cost_per_m2 as number) * (s.beds as number) * (s.area_per_bed as number)) / 4;
     assert.ok(Math.abs(cost - expected) <= 1, "cost categories add up to facility cost");
   }
-  // latest quarter is exactly the brief's numbers
+  // latest quarter is exactly the site profile's numbers
   const a = d.site_snapshots.find((x) => x.site_id === 1 && x.period === "2026-Q3")!;
-  assert.equal(a.occupancy, 68);
-  assert.equal(a.beds, 320);
+  assert.equal(a.occupancy, DEMO_SITES[0].latest.occupancy);
+  assert.equal(a.beds, DEMO_SITES[0].latest.beds);
   // deterministic
   assert.deepEqual(generateDemoDataset().monthly_activity.slice(0, 5), d.monthly_activity.slice(0, 5));
 });

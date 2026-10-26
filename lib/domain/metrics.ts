@@ -15,7 +15,7 @@ export interface MetricDef {
 }
 
 export const METRICS: MetricDef[] = [
-  { key: "beds", label: "Licensed beds", short: "Beds", unit: "beds", decimals: 0, min: 50, max: 900, step: 5,
+  { key: "beds", label: "Licensed beds", short: "Beds", unit: "beds", decimals: 0, min: 50, max: 2500, step: 5,
     definition: "Number of licensed (planned) inpatient beds." },
   { key: "occupancy", label: "Bed occupancy", short: "Occupancy", unit: "%", direction: "higher", decimals: 0, min: 40, max: 100, step: 1,
     definition: "Occupied bed-days divided by available bed-days over a year.",
@@ -35,7 +35,7 @@ export const METRICS: MetricDef[] = [
   { key: "energy", label: "Energy use", short: "Energy", unit: "kWh/m²", direction: "lower", decimals: 0, min: 120, max: 400, step: 5,
     definition: "Annual final energy consumption per m².",
     action: "Plan an energy retrofit (HVAC, building control, insulation)" },
-  { key: "travelTime", label: "Avg. patient travel time", short: "Travel", unit: "min", direction: "lower", decimals: 0, min: 10, max: 90, step: 1,
+  { key: "travelTime", label: "Avg. patient travel time", short: "Travel", unit: "min", direction: "lower", decimals: 0, min: 5, max: 90, step: 1,
     definition: "Average travel time of the site's patients from home to the site.",
     action: "Add outreach, day-care or telehealth services to ease long journeys" },
 ];
@@ -46,24 +46,24 @@ export const SCORED_KEYS = SCORED_METRICS.map((m) => m.key);
 
 /** Illustrative placeholders — the real values live in the `benchmark_values` table. */
 export const DEFAULT_BENCHMARK: Benchmark = {
-  occupancy: 85,
-  areaPerBed: 105,
-  costPerM2: 280,
+  occupancy: 78,
+  areaPerBed: 112,
+  costPerM2: 285,
   orUtil: 80,
   spaceUse: 85,
-  energy: 220,
-  travelTime: 30,
+  energy: 235,
+  travelTime: 20,
 };
 
 export const DEFAULT_SETTINGS: Settings = {
-  alosDays: 5.2,
+  alosDays: 5.7,
   parThreshold: 95,
   watchThreshold: 75,
   scoreCap: 150,
   goodAverage: 90,
   closeAverage: 60,
   closeGaps: 4,
-  travelLimit: 30,
+  travelLimit: 25,
   releaseFactor: 0.6,
   moveFactor: 0.7,
   closeFactor: 0.8,

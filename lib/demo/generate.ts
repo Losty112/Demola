@@ -24,26 +24,18 @@ const site = (slug: string, name: string, region: string, kind: string, trend: n
   beds: number, occupancy: number, areaPerBed: number, costPerM2: number, orUtil: number, spaceUse: number, energy: number, travelTime: number): DemoSite =>
   ({ slug, name, region, kind, trend, latest: { beds, occupancy, areaPerBed, costPerM2, orUtil, spaceUse, energy, travelTime } });
 
-// Sites A–C are the sample sites from the project brief (tests rely on them); the rest are invented.
+// Illustrative Prague network. Hospital names and approximate bed counts are real-world anchors; every metric below is an
+// invented estimate (not official data) and must be replaced with ÚZIS / hospital figures before any real decision.
 export const DEMO_SITES: DemoSite[] = [
-  site("site-a-north", "Site A – North", "North", "Central hospital", 1, 320, 68, 138, 315, 58, 62, 290, 22),
-  site("site-b-central", "Site B – Central", "Central", "University hospital", 1, 540, 82, 112, 290, 76, 81, 235, 18),
-  site("site-c-rural", "Site C – Rural", "Rural", "Local hospital", -1, 140, 55, 165, 340, 41, 54, 310, 48),
-  site("site-d-east", "Site D – East", "East", "Central hospital", -1, 410, 76, 118, 300, 69, 73, 262, 27),
-  site("site-e-coast", "Site E – South Coast", "South", "Local hospital", 1, 260, 88, 108, 275, 82, 86, 215, 21),
-  site("site-f-archipelago", "Site F – Archipelago", "West", "Local hospital", -1, 90, 49, 178, 365, 36, 48, 335, 62),
-  site("site-g-lakeside", "Site G – Lakeside", "North", "Local hospital", 1, 180, 74, 126, 296, 66, 71, 248, 29),
-  site("site-h-harbour", "Site H – Harbour", "South", "Central hospital", 1, 460, 84, 109, 283, 78, 83, 226, 20),
-  site("site-i-highlands", "Site I – Highlands", "Rural", "Local hospital", -1, 110, 52, 171, 352, 38, 50, 322, 55),
-  site("site-j-riverside", "Site J – Riverside", "Central", "Specialist clinic", 1, 120, 79, 124, 310, 85, 78, 241, 24),
-  site("site-k-old-town", "Site K – Old Town", "Central", "Central hospital", -1, 380, 71, 134, 322, 63, 66, 284, 19),
-  site("site-l-valley", "Site L – Valley", "East", "Local hospital", 0, 200, 66, 144, 318, 52, 64, 276, 36),
-  site("site-m-campus", "Site M – University Campus", "Central", "University hospital", 1, 780, 87, 118, 305, 84, 88, 252, 25),
-  site("site-n-foothills", "Site N – Foothills", "West", "Local hospital", -1, 130, 58, 158, 338, 44, 57, 301, 44),
-  site("site-o-bay", "Site O – Bay", "South", "Central hospital", 0, 350, 79, 115, 292, 72, 77, 247, 26),
-  site("site-p-plains", "Site P – Plains", "East", "Central hospital", 1, 300, 77, 121, 287, 70, 75, 238, 31),
-  site("site-q-forest", "Site Q – Forest", "North", "Local hospital", -1, 100, 51, 175, 358, 35, 47, 329, 58),
-  site("site-r-island", "Site R – Island", "West", "Local hospital", 0, 75, 62, 149, 372, 40, 59, 318, 71),
+  site("fn-motol", "FN Motol", "Praha 5", "University hospital", 1, 2100, 80, 124, 295, 74, 80, 255, 22),
+  site("vfn-praha", "VFN Praha", "Praha 2", "University hospital", 0, 1400, 77, 128, 305, 72, 78, 262, 14),
+  site("fn-bulovka", "FN Bulovka", "Praha 8", "University hospital", 1, 1000, 79, 120, 290, 75, 81, 248, 17),
+  site("fnkv-vinohrady", "FNKV Vinohrady", "Praha 10", "University hospital", -1, 1100, 74, 132, 310, 68, 74, 270, 16),
+  site("thomayerova-nemocnice", "Thomayerova nemocnice", "Praha 4", "Central hospital", 0, 1000, 72, 136, 300, 66, 72, 268, 19),
+  site("nemocnice-na-homolce", "Nemocnice Na Homolce", "Praha 5", "Central hospital", 1, 800, 82, 112, 315, 83, 84, 238, 24),
+  site("uvn-stresovice", "ÚVN Střešovice", "Praha 6", "Central hospital", -1, 900, 68, 142, 325, 60, 66, 285, 21),
+  site("nemocnice-na-frantisku", "Nemocnice Na Františku", "Praha 1", "Local hospital", 0, 200, 70, 150, 340, 58, 66, 300, 12),
+  site("nemocnice-milosrdnych-sester", "Nemocnice Milosrdných sester", "Praha 1", "Local hospital", -1, 150, 64, 158, 350, 52, 62, 310, 13),
 ];
 
 /** Twelve quarters, oldest first. */
@@ -114,8 +106,12 @@ const CASE_HOURS: Record<string, number> = { "University hospital": 2.4, "Centra
 
 const COST_SHARES: [string, number][] = [["cleaning", 0.18], ["maintenance", 0.24], ["utilities", 0.22], ["security", 0.05], ["facility_management", 0.17], ["rent_leasing", 0.14]];
 
-const PLACE_A = ["North", "Stone", "Green", "Lake", "Hill", "River", "Oak", "Red", "White", "Fair", "Mill", "Black", "Silver", "Iron", "Salt", "Elm"];
-const PLACE_B = ["ton", "field", "bridge", "dale", "port", "wick", "ford", "haven", "ville", "burg"];
+// Prague districts (nearest first, by distance from the site's own district) and towns in the surrounding region.
+const OUTER_PLACES = ["Černošice", "Říčany", "Jesenice", "Úvaly", "Brandýs nad Labem", "Beroun", "Kladno", "Mladá Boleslav", "Kolín"];
+const districtOf = (region: string) => Number(region.replace(/\D/g, "")) || 1;
+const nearestDistricts = (home: number) =>
+  Array.from({ length: 22 }, (_, i) => i + 1).sort((a, b) => Math.min(Math.abs(a - home), 22 - Math.abs(a - home)) - Math.min(Math.abs(b - home), 22 - Math.abs(b - home)) || a - b)
+    .map((n) => `Praha ${n}`);
 
 // ---------------------------------------------------------------------------------------------------
 
@@ -271,14 +267,8 @@ export function generateDemoDataset(): DemoDataset {
     // catchment: complete years only (2024, 2025). Weighted mean travel time matches the site's yearly mean.
     for (const year of [2024, 2025]) {
       const target = yearTravel[year].reduce((a, b) => a + b, 0) / yearTravel[year].length;
-      const n = clamp(Math.round(5 + beds / 90), 6, 11);
-      const used = new Set<string>();
-      const places = Array.from({ length: n }, () => {
-        let name = "";
-        do name = PLACE_A[Math.floor(r() * PLACE_A.length)] + PLACE_B[Math.floor(r() * PLACE_B.length)]; while (used.has(name));
-        used.add(name);
-        return name;
-      });
+      const n = clamp(Math.round(5 + beds / 250), 6, 11);
+      const places = [...nearestDistricts(districtOf(s.region)).slice(0, n - 3), ...OUTER_PLACES.slice(0, 3)];
       const base = places.map((_, i) => 0.25 + (i / (n - 1)) * 1.75 + noise(r) * 0.08); // relative distance 0.25..2
       const tau = target * 0.9;
       const weights = base.map((b) => Math.exp(-(b * target) / tau));
