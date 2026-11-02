@@ -19,6 +19,8 @@ interface Props {
   benchmark: Benchmark;
   settings: Settings;
   initialScenario: ScenarioInput;
+  /** Planned (not yet built) hospital: no closure/merger verdict, trends or move scenarios. */
+  plan?: boolean;
 }
 
 const VERDICT_STYLE = {
@@ -28,7 +30,7 @@ const VERDICT_STYLE = {
   close: "border-gap/40 bg-gap/5 text-gap",
 } as const;
 
-export function SiteWorkbench({ name, history, benchmark, settings, initialScenario }: Props) {
+export function SiteWorkbench({ name, history, benchmark, settings, initialScenario, plan = false }: Props) {
   const latest = history[history.length - 1];
   const [snap, setSnap] = useState<Snapshot>(latest);
   const [scenario, setScenario] = useState<ScenarioInput>(initialScenario);
@@ -68,11 +70,19 @@ export function SiteWorkbench({ name, history, benchmark, settings, initialScena
 
       <div className="min-w-0 space-y-5">
         {/* Verdict */}
+        {plan ? (
+          <div className={`rounded-2xl border-2 p-5 ${analysis.gaps === 0 && analysis.average >= settings.goodAverage ? VERDICT_STYLE.good : VERDICT_STYLE.improve}`}>
+            <div className="text-xs font-semibold uppercase tracking-wide opacity-80">Plan check · {name}</div>
+            <h2 className="mt-1 text-2xl font-semibold tracking-tight">{analysis.gaps === 0 && analysis.average >= settings.goodAverage ? "The plan is in line with the benchmark" : `${analysis.gaps || analysis.scores.filter((x) => x.status !== "par").length} design target${(analysis.gaps || analysis.scores.filter((x) => x.status !== "par").length) === 1 ? "" : "s"} below benchmark`}</h2>
+            <p className="mt-1 text-sm text-ink/80">Average {formatInt(analysis.average)}% of the benchmark hospital; weakest target: {METRIC_BY_KEY[analysis.worst.key].label.toLowerCase()}. Adjust the sliders to test alternatives.</p>
+          </div>
+        ) : (
         <div className={`rounded-2xl border-2 p-5 ${VERDICT_STYLE[rec.verdict]}`}>
           <div className="text-xs font-semibold uppercase tracking-wide opacity-80">Recommendation · {name}</div>
           <h2 className="mt-1 text-2xl font-semibold tracking-tight">{rec.headline}</h2>
           <p className="mt-1 text-sm text-ink/80">{rec.text}</p>
         </div>
+        )}
 
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           <Kpi label="Average vs. benchmark" value={`${formatInt(analysis.average)}%`} hint={`${analysis.gaps} gap${analysis.gaps === 1 ? "" : "s"} · weakest: ${METRIC_BY_KEY[analysis.worst.key].short}`}
@@ -118,6 +128,7 @@ export function SiteWorkbench({ name, history, benchmark, settings, initialScena
           </Card>
         </div>
 
+        {!plan && (
         <details className="group rounded-2xl border border-line bg-surface shadow-card">
           <summary className="cursor-pointer select-none px-5 py-3 text-sm font-medium text-brand-600 group-open:border-b group-open:border-line">Trends and space need</summary>
           <div className="grid gap-5 p-5 xl:grid-cols-2">
@@ -155,7 +166,9 @@ export function SiteWorkbench({ name, history, benchmark, settings, initialScena
           </Card>
           </div>
         </details>
+        )}
 
+        {!plan && (
         <Card title="Scenarios: saving vs. access impact" subtitle="Simplified model — a real digital twin would replace these assumptions with live building and patient-flow data">
           <div className="mb-5 grid gap-5 sm:grid-cols-2">
             <label className="block text-xs text-muted">
@@ -177,8 +190,9 @@ export function SiteWorkbench({ name, history, benchmark, settings, initialScena
             Assumes {settings.releaseFactor * 100}% of released-space cost, {settings.moveFactor * 100}% of moved-service space cost and {settings.closeFactor * 100}% of full-closure cost is realised.
           </p>
         </Card>
+        )}
 
-        <Card title="Action plan" subtitle="Every metric, weakest first">
+        <Card title={plan ? "Design points" : "Action plan"} subtitle="Every metric, weakest first">
           <ol className="divide-y divide-line">
             {rec.actions.map((a, i) => {
               const m = METRIC_BY_KEY[a.key];
@@ -196,9 +210,11 @@ export function SiteWorkbench({ name, history, benchmark, settings, initialScena
               );
             })}
           </ol>
+          {!plan && (
           <p className="mt-3 text-xs text-muted">
             Decision rules are illustrative and meant to be agreed with stakeholders: good = average ≥ {settings.goodAverage}% and no gaps; closure/merger only if average &lt; {settings.closeAverage}%, ≥ {settings.closeGaps} gaps and extra travel ≤ {settings.travelLimit} min.
           </p>
+          )}
         </Card>
       </div>
     </div>
