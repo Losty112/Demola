@@ -16,7 +16,7 @@ export function BuildSizing({ plan }: { plan: BuildPlan }) {
 
   return (
     <div className="space-y-4">
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="stagger grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <Kpi label="Beds to build" value={formatInt(base.beds)} hint={`at ${plan.targetOcc}% occupancy`} />
         <Kpi label="Floor area" value={`${formatInt(base.area)} m²`} hint={`${plan.areaPerBed} m² per bed`} />
         <Kpi label="Facility cost" value={formatEuroCompact(base.cost)} hint="per year, once open" tone="warn" />

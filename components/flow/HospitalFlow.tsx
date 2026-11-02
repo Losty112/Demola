@@ -1,5 +1,5 @@
 "use client";
-import { useId, useState, type KeyboardEvent, type ReactNode } from "react";
+import { useEffect, useId, useState, type KeyboardEvent, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { SiteWorkbench } from "@/components/site/SiteWorkbench";
 import type { Benchmark, ScenarioInput, Settings, Snapshot } from "@/lib/domain/types";
@@ -36,7 +36,7 @@ function Tabs({ tabs, label }: { tabs: { id: string; label: string; content: Rea
   };
   return (
     <div className="space-y-5">
-      <div role="tablist" aria-label={label} onKeyDown={onKey} className="flex gap-1 overflow-x-auto rounded-xl border border-line bg-white/70 p-1">
+      <div role="tablist" aria-label={label} onKeyDown={onKey} className="flex gap-1 overflow-x-auto rounded-xl border border-line bg-white/5 p-1">
         {tabs.map((t) => (
           <button key={t.id} id={`${uid}-tab-${t.id}`} role="tab" type="button" aria-selected={t.id === active} aria-controls={`${uid}-panel`} tabIndex={t.id === active ? 0 : -1}
             onClick={() => setActive(t.id)}
@@ -45,7 +45,8 @@ function Tabs({ tabs, label }: { tabs: { id: string; label: string; content: Rea
           </button>
         ))}
       </div>
-      <div id={`${uid}-panel`} role="tabpanel" aria-labelledby={`${uid}-tab-${active}`}>{tabs[idx].content}</div>
+      {/* keyed by tab: the panel animates in every time you switch */}
+      <div key={active} id={`${uid}-panel`} role="tabpanel" aria-labelledby={`${uid}-tab-${active}`} className="rise">{tabs[idx].content}</div>
     </div>
   );
 }
@@ -69,6 +70,13 @@ export function HospitalFlow({ benchmark, settings, scenario, slots }: {
   const goto = (s: Stage) => { setStage(s); window.scrollTo({ top: 0 }); };
   const reset = () => { setOwn(null); setBuild(null); setSaveMsg(null); goto("start"); };
 
+  // The header logo asks the flow to go back to the start screen
+  useEffect(() => {
+    const home = () => { setOwn(null); setBuild(null); setSaveMsg(null); setStage("start"); window.scrollTo({ top: 0, behavior: "smooth" }); };
+    window.addEventListener("app:home", home);
+    return () => window.removeEventListener("app:home", home);
+  }, []);
+
   const save = async () => {
     if (!own) return;
     setSaveMsg(null);
@@ -86,64 +94,64 @@ export function HospitalFlow({ benchmark, settings, scenario, slots }: {
 
   const labels = ["Choose", "Enter data", "Overview"];
   const name = path === "own" ? own?.name : build?.name;
+  const ghost = "rounded-xl border border-brand-200 bg-white/5 px-4 py-2 text-sm font-semibold text-brand-700 backdrop-blur hover:border-brand-400 hover:bg-brand-100";
 
   return (
     <>
       <BackgroundVideo dim="reading" />
-      {/* Light "analysis sheet" floating over the dimmed video: keeps every chart and table readable */}
-      <div className="mx-auto w-full max-w-[1280px] px-3 pb-16 pt-24 sm:px-6">
-        <div className="rounded-[28px] bg-page p-4 shadow-2xl ring-1 ring-white/10 sm:p-8">
-              <div className="space-y-6">
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <Stepper current={stage === "data" ? 1 : 2} labels={labels} />
-                  <span className="rounded-full bg-brand-50 px-3 py-1 text-xs font-medium text-brand-700">{path === "own" ? "I own a hospital" : "I want to build a hospital"}</span>
+      {/* No panel behind the content: dark glass cards sit directly on the dimmed video */}
+      <div className="mx-auto w-full max-w-[1280px] space-y-6 px-4 pb-20 pt-24 sm:px-6">
+        <div className="fade-in flex flex-wrap items-center justify-between gap-3">
+          <Stepper current={stage === "data" ? 1 : 2} labels={labels} />
+          <span className="rounded-full border border-brand-200 bg-brand-50 px-3 py-1 text-xs font-medium text-brand-700">{path === "own" ? "I own a hospital" : "I want to build a hospital"}</span>
+        </div>
+
+        {/* keyed by stage: each stage animates in when you click through */}
+        <div key={stage} className="rise">
+          {stage === "data" && path === "own" && (
+            <OwnerForm benchmark={benchmark} initial={own ?? undefined} onBack={reset} onSubmit={(n, s) => { setOwn({ name: n, snap: s }); goto("overview"); }} />
+          )}
+          {stage === "data" && path === "build" && (
+            <BuilderForm benchmark={benchmark} settings={settings} initial={build ?? undefined} onBack={reset} onSubmit={(n, p) => { setBuild({ name: n, plan: p }); goto("overview"); }} />
+          )}
+
+          {stage === "overview" && name && (
+            <div className="space-y-5">
+              <div className="flex flex-wrap items-end justify-between gap-3">
+                <div>
+                  <h1 className="font-display text-4xl tracking-wide text-ink sm:text-6xl">Overview · {name}</h1>
+                  <p className="text-sm text-muted">{path === "own" ? "How your hospital compares with the benchmark, and what a change would do." : "What the area needs, and how the plan compares with the benchmark."}</p>
                 </div>
-
-                {stage === "data" && path === "own" && (
-                  <OwnerForm benchmark={benchmark} initial={own ?? undefined} onBack={reset} onSubmit={(n, s) => { setOwn({ name: n, snap: s }); goto("overview"); }} />
-                )}
-                {stage === "data" && path === "build" && (
-                  <BuilderForm benchmark={benchmark} settings={settings} initial={build ?? undefined} onBack={reset} onSubmit={(n, p) => { setBuild({ name: n, plan: p }); goto("overview"); }} />
-                )}
-
-                {stage === "overview" && name && (
-                  <div className="space-y-5">
-                    <div className="flex flex-wrap items-end justify-between gap-3">
-                      <div>
-                        <h1 className="font-display text-4xl tracking-wide text-ink sm:text-5xl">Overview · {name}</h1>
-                        <p className="text-sm text-muted">{path === "own" ? "How your hospital compares with the benchmark, and what a change would do." : "What the area needs, and how the plan compares with the benchmark."}</p>
-                      </div>
-                      <div className="flex flex-wrap items-center gap-2">
-                        {path === "own" && <button type="button" onClick={save} className="rounded-xl bg-white px-4 py-2 text-sm font-semibold text-brand-600 ring-1 ring-brand-200 hover:bg-brand-50">Save to network</button>}
-                        <button type="button" onClick={() => goto("data")} className="rounded-xl bg-white px-4 py-2 text-sm font-semibold text-brand-600 ring-1 ring-brand-200 hover:bg-brand-50">Edit data</button>
-                        <button type="button" onClick={reset} className="rounded-xl px-4 py-2 text-sm font-medium text-muted hover:bg-brand-50">Start over</button>
-                      </div>
-                    </div>
-                    {saveMsg && <p role="status" className={`text-sm ${saveMsg.ok ? "text-par" : "text-gap"}`}>{saveMsg.text}</p>}
-
-                    {path === "own" && own && (
-                      <Tabs label="Overview sections" tabs={[
-                        { id: "hospital", label: "Your hospital", content: <SiteWorkbench key={JSON.stringify(own)} name={own.name} history={[own.snap]} benchmark={benchmark} settings={settings} initialScenario={scenario} /> },
-                        { id: "closure", label: "Ward closure", content: slots.closure },
-                        { id: "network", label: "Network", content: slots.network },
-                        { id: "sites", label: "Sites & compare", content: <div className="space-y-8">{slots.sites}{slots.compare}</div> },
-                        { id: "data", label: "Benchmark & data", content: slots.data },
-                      ]} />
-                    )}
-                    {path === "build" && build && (
-                      <Tabs label="Overview sections" tabs={[
-                        { id: "plan", label: "Your plan", content: (
-                          <div className="space-y-6">
-                            <BuildSizing plan={build.plan} />
-                            <SiteWorkbench key={JSON.stringify(build)} name={build.name} history={[planToSnapshot(build.plan)]} benchmark={benchmark} settings={settings} initialScenario={scenario} plan />
-                          </div>
-                        ) },
-                        { id: "data", label: "Benchmark & data", content: slots.data },
-                      ]} />
-                    )}
-                  </div>
-                )}
+                <div className="flex flex-wrap items-center gap-2">
+                  {path === "own" && <button type="button" onClick={save} className={ghost}>Save to network</button>}
+                  <button type="button" onClick={() => goto("data")} className={ghost}>Edit data</button>
+                  <button type="button" onClick={reset} className="rounded-xl px-4 py-2 text-sm font-medium text-muted hover:bg-white/10 hover:text-ink">Start over</button>
+                </div>
               </div>
+              {saveMsg && <p role="status" className={`text-sm ${saveMsg.ok ? "text-par" : "text-gap"}`}>{saveMsg.text}</p>}
+
+              {path === "own" && own && (
+                <Tabs label="Overview sections" tabs={[
+                  { id: "hospital", label: "Your hospital", content: <SiteWorkbench key={JSON.stringify(own)} name={own.name} history={[own.snap]} benchmark={benchmark} settings={settings} initialScenario={scenario} /> },
+                  { id: "closure", label: "Ward closure", content: slots.closure },
+                  { id: "network", label: "Network", content: slots.network },
+                  { id: "sites", label: "Sites & compare", content: <div className="space-y-8">{slots.sites}{slots.compare}</div> },
+                  { id: "data", label: "Benchmark & data", content: slots.data },
+                ]} />
+              )}
+              {path === "build" && build && (
+                <Tabs label="Overview sections" tabs={[
+                  { id: "plan", label: "Your plan", content: (
+                    <div className="space-y-6">
+                      <BuildSizing plan={build.plan} />
+                      <SiteWorkbench key={JSON.stringify(build)} name={build.name} history={[planToSnapshot(build.plan)]} benchmark={benchmark} settings={settings} initialScenario={scenario} plan />
+                    </div>
+                  ) },
+                  { id: "data", label: "Benchmark & data", content: slots.data },
+                ]} />
+              )}
+            </div>
+          )}
         </div>
       </div>
     </>

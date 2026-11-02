@@ -28,7 +28,7 @@ export function MetricTrends({ history, benchmark }: { history: Snapshot[]; benc
           <Tooltip {...tooltipStyle} formatter={(v) => [`${v} ${m.unit}`, m.label]} />
           <ReferenceLine y={benchmark[key]} stroke={CHART.bench} strokeDasharray="5 4"
             label={{ value: `Benchmark ${benchmark[key]}`, position: "insideTopRight", fill: CHART.axis, fontSize: 11 }} />
-          <Line type="monotone" dataKey="value" stroke={CHART.brand} strokeWidth={3} dot={{ r: 4, fill: "#fff", strokeWidth: 2 }} />
+          <Line type="monotone" dataKey="value" stroke={CHART.brand} strokeWidth={3} dot={{ r: 4, fill: "#04070d", strokeWidth: 2 }} />
         </LineChart>
       </ResponsiveContainer>
       <p className="text-xs text-muted">{m.label} ({m.unit}) — {m.direction === "higher" ? "higher is better" : "lower is better"}. {m.definition}</p>

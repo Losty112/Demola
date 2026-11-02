@@ -33,7 +33,7 @@ export function OwnerForm({ benchmark, initial, onSubmit, onBack }: {
       <div className="mb-5 flex flex-wrap items-center gap-2 text-xs">
         <span className="text-muted">No data at hand? Try an example:</span>
         {EXAMPLES.map((e) => (
-          <button key={e.name} type="button" onClick={() => load(e)} className={`rounded-full px-3 py-1.5 font-medium ring-1 ${e.green ? "bg-par/10 text-par ring-par/40 hover:bg-par/20" : "bg-white text-brand-700 ring-brand-200 hover:bg-brand-50"}`}>{e.name} <span className={e.green ? "text-par/80" : "text-muted"}>· {e.note}</span></button>
+          <button key={e.name} type="button" onClick={() => load(e)} className={`rounded-full px-3 py-1.5 font-medium ring-1 ${e.green ? "bg-par/10 text-par ring-par/40 hover:bg-par/20" : "bg-white/5 text-brand-700 ring-brand-200 hover:bg-brand-50"}`}>{e.name} <span className={e.green ? "text-par/80" : "text-muted"}>· {e.note}</span></button>
         ))}
       </div>
       <form className="space-y-5" onSubmit={(e) => { e.preventDefault(); if (!invalid && name.trim()) onSubmit(name.trim(), { period, ...Object.fromEntries(parsed.map(({ m, v }) => [m.key, v])) } as unknown as Snapshot); }}>

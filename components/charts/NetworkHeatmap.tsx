@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { SCORED_METRICS } from "@/lib/domain/metrics";
 import type { NetworkSite } from "@/lib/db/repository";
 
@@ -26,7 +25,7 @@ export function NetworkHeatmap({ sites }: { sites: NetworkSite[] }) {
           {sites.map((s) => (
             <tr key={s.slug}>
               <td className="whitespace-nowrap px-2 py-1.5 font-medium">
-                <Link href={`/sites/${s.slug}`} className="text-brand-600 hover:underline">{s.name}</Link>
+                <span className="font-medium text-ink">{s.name}</span>
               </td>
               {s.analysis.scores.map((sc) => {
                 const c = cellColor(sc.score);

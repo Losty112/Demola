@@ -1,5 +1,6 @@
 "use client";
 import { useMemo } from "react";
+import { MAP_ATTRIBUTION, tileUrl, tilesCovering, zoomFor } from "@/lib/closure/geo";
 import type { ScenarioResult, Ward } from "@/lib/closure/types";
 import { STATUS_META, capacityStatus } from "@/lib/closure/status";
 import { formatInt } from "@/lib/format";
@@ -23,7 +24,9 @@ function makeProjector(wards: Ward[]) {
   const scale = Math.min((W - 2 * PAD) / ((lonMax - lonMin) * kmLon), (H - 2 * PAD) / ((latMax - latMin) * kmLat));
   const offX = PAD + (W - 2 * PAD - (lonMax - lonMin) * kmLon * scale) / 2;
   const offY = PAD + (H - 2 * PAD - (latMax - latMin) * kmLat * scale) / 2;
-  return (lat: number, lon: number): [number, number] => [offX + (lon - lonMin) * kmLon * scale, offY + (latMax - lat) * kmLat * scale];
+  const project = (lat: number, lon: number): [number, number] => [offX + (lon - lonMin) * kmLon * scale, offY + (latMax - lat) * kmLat * scale];
+  const unproject = (x: number, y: number) => ({ lon: lonMin + (x - offX) / (kmLon * scale), lat: latMax - (y - offY) / (kmLat * scale) });
+  return { project, unproject, pxPerDegLon: kmLon * scale };
 }
 
 /**
@@ -46,7 +49,12 @@ export function NetworkMap({ wards, result, view, focusId, onFocus, onSelect, se
   compact?: boolean;
   title: string;
 }) {
-  const project = useMemo(() => makeProjector(wards), [wards]);
+  const { project, unproject, pxPerDegLon } = useMemo(() => makeProjector(wards), [wards]);
+  // Map background: real tiles covering the whole drawing area, placed with the same projection as the wards
+  const tiles = useMemo(() => {
+    const nw = unproject(0, 0), se = unproject(W, H);
+    return tilesCovering({ north: nw.lat, south: se.lat, west: nw.lon, east: se.lon }, zoomFor(pxPerDegLon));
+  }, [unproject, pxPerDegLon]);
   const maxTotal = Math.max(1, ...result.used.map((u) => u.total));
   const [sx, sy] = project(result.src.lat, result.src.lon);
   const isAfter = view === "after";
@@ -58,13 +66,24 @@ export function NetworkMap({ wards, result, view, focusId, onFocus, onSelect, se
   const flows = !isAfter ? [] : result.used.filter((u) => showAllFlows || focusId === result.src.id || focusId === u.site.id);
 
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} className="w-full rounded-xl bg-brand-50/60" role="group" aria-label={title}
+    <svg viewBox={`0 0 ${W} ${H}`} className="w-full rounded-xl bg-night" role="group" aria-label={title}
       onMouseLeave={() => onFocus(null)}>
       <defs>
         <marker id={`arrow-${view}`} viewBox="0 0 10 10" refX="9" refY="5" markerWidth="11" markerHeight="11" orient="auto" markerUnits="userSpaceOnUse">
-          <path d="M0,0 L10,5 L0,10 z" fill="#1c63c7" />
+          <path d="M0,0 L10,5 L0,10 z" fill="#8dbfff" />
         </marker>
       </defs>
+
+      {/* Map background: dark street map under a dim layer so the wards stay the focus */}
+      <g aria-hidden="true">
+        <rect width={W} height={H} fill="#07101f" />
+        {tiles.map((t) => {
+          const [x0, y0] = project(t.north, t.west), [x1, y1] = project(t.south, t.east);
+          return <image key={`${t.z}/${t.x}/${t.y}`} href={tileUrl(t)} x={x0} y={y0} width={x1 - x0 + 0.6} height={y1 - y0 + 0.6} preserveAspectRatio="none" opacity={0.9} />;
+        })}
+        <rect width={W} height={H} fill="#04070d" opacity={0.28} />
+        <text x={W - 8} y={H - 7} textAnchor="end" fontSize={9} fill="#9aa7ba">{MAP_ATTRIBUTION}</text>
+      </g>
 
       {/* Flow arrows (on demand) */}
       {flows.map((u) => {
@@ -73,7 +92,7 @@ export function NetworkMap({ wards, result, view, focusId, onFocus, onSelect, se
         const r = radius(u.site.beds);
         return (
           <line key={u.site.id} x1={sx + (dx / len) * 14} y1={sy + (dy / len) * 14} x2={px - (dx / len) * (r + 3)} y2={py - (dy / len) * (r + 3)}
-            stroke="#1c63c7" strokeOpacity={0.75} strokeWidth={2 + (compact ? 6 : 9) * (u.total / maxTotal)} markerEnd={`url(#arrow-${view})`} pointerEvents="none" />
+            stroke="#5a9fff" strokeOpacity={0.9} className="flow-line" strokeWidth={2 + (compact ? 6 : 9) * (u.total / maxTotal)} markerEnd={`url(#arrow-${view})`} pointerEvents="none" />
         );
       })}
 
@@ -100,25 +119,25 @@ export function NetworkMap({ wards, result, view, focusId, onFocus, onSelect, se
             onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onSelect(w.id); } }}>
             {/* generous invisible hit area for touch */}
             <circle cx={x} cy={y} r={Math.max(r + 8, 18)} fill="transparent" />
-            {active && <circle cx={x} cy={y} r={r + 5} fill="none" stroke="#184f9f" strokeWidth={2} />}
+            {active && <circle cx={x} cy={y} r={r + 5} fill="none" stroke="#8dbfff" strokeWidth={2.5} />}
             {hollow ? (
               <circle cx={x} cy={y} r={r} fill="#fff" stroke="#04070d" strokeWidth={2} strokeDasharray={closed ? undefined : "4 3"} />
             ) : (
-              <circle cx={x} cy={y} r={r} fill={meta.fill} fillOpacity={0.9} stroke="#fff" strokeWidth={1.5} />
+              <circle cx={x} cy={y} r={r} fill={meta.fill} fillOpacity={0.95} stroke="#fff" strokeWidth={1.5} style={{ transition: "fill .6s ease" }} />
             )}
             {/* glyph inside the node: status is readable without colour */}
             {!hollow && r >= 9 && <text x={x} y={y + 4} textAnchor="middle" fontSize={11} fontWeight={700} fill="#fff" pointerEvents="none">{meta.glyph}</text>}
             {hollow && closed && (
               <path d={`M${x - r * 0.5},${y - r * 0.5} L${x + r * 0.5},${y + r * 0.5} M${x + r * 0.5},${y - r * 0.5} L${x - r * 0.5},${y + r * 0.5}`} stroke="#e5484d" strokeWidth={2.5} strokeLinecap="round" />
             )}
-            <text x={left ? x - r - 6 : x + r + 6} y={y + 4} textAnchor={left ? "end" : "start"} fontSize={compact ? 11 : 12} fontWeight={600} fill="#04070d" pointerEvents="none"
-              style={{ paintOrder: "stroke", stroke: "#ffffff", strokeWidth: 3 }}>
+            <text x={left ? x - r - 6 : x + r + 6} y={y + 4} textAnchor={left ? "end" : "start"} fontSize={compact ? 11 : 12} fontWeight={600} fill="#ffffff" pointerEvents="none"
+              style={{ paintOrder: "stroke", stroke: "#04070d", strokeWidth: 3.5 }}>
               {w.short}
             </text>
             {/* the one extra line of detail appears only for the focused ward */}
             {active && !compact && (
-              <text x={left ? x - r - 6 : x + r + 6} y={y + 19} textAnchor={left ? "end" : "start"} fontSize={10.5} fill="#5b6470" pointerEvents="none"
-                style={{ paintOrder: "stroke", stroke: "#ffffff", strokeWidth: 3 }}>
+              <text x={left ? x - r - 6 : x + r + 6} y={y + 19} textAnchor={left ? "end" : "start"} fontSize={10.5} fill="#c9d3e3" pointerEvents="none"
+                style={{ paintOrder: "stroke", stroke: "#04070d", strokeWidth: 3.5 }}>
                 {recv && isAfter ? `+${formatInt(recv.total)} → ${Math.round(recv.occAfter * 100)}%` : `${Math.round(occOf(w) * 100)}%`}
               </text>
             )}

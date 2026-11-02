@@ -1,39 +1,39 @@
 @import "tailwindcss";
 
 /*
- * Base palette: four colours only.
- *   black  --color-night / --color-ink      blue  --color-brand-*   (one hue, tints for backgrounds)
- *   green  --color-par                      white --color-page / --color-surface
- * Data colours (charts, capacity status yellow/red, series) are separate and live in
- * components/charts/theme.ts and lib/closure/status.ts.
+ * Base palette: black, blue, green, white.
+ * The whole interface is dark: black glass panels over the video, white text, blue and green accents.
+ * Data colours (charts, capacity status yellow/red, series) live in components/charts/theme.ts
+ * and lib/closure/status.ts.
  */
 @theme {
-  --color-ink: #04070d; /* black */
-  --color-muted: #5b6470; /* black at ~65 %, neutral */
-  --color-line: #e3e7ec;
-  --color-surface: #ffffff;
-  --color-page: #ffffff; /* white */
-  --color-brand-50: #eef6ff;
-  --color-brand-100: #dcebff;
-  --color-brand-200: #bcd9ff;
-  --color-brand-300: #8dbfff;
+  --color-ink: #eef2f8; /* main text (white-ish) */
+  --color-muted: #9aa7ba; /* secondary text */
+  --color-line: rgb(255 255 255 / 0.13); /* hairlines and borders */
+  --color-surface: rgb(8 14 26 / 0.66); /* glass panels */
+  --color-page: #04070d;
+  /* blue: tints for backgrounds, lighter steps for text on dark */
+  --color-brand-50: rgb(43 125 233 / 0.13);
+  --color-brand-100: rgb(43 125 233 / 0.22);
+  --color-brand-200: rgb(90 159 255 / 0.38);
+  --color-brand-300: #3d86ee;
   --color-brand-400: #5a9fff;
   --color-brand-500: #2b7de9;
-  --color-brand-600: #1c63c7;
-  --color-brand-700: #184f9f;
+  --color-brand-600: #6aa9ff;
+  --color-brand-700: #9cc4ff;
   --color-par: #12a37a;
   --color-watch: #e8920f;
   --color-gap: #e5484d;
   --color-night: #04070d;
   --color-glow: #5a9fff; /* accent blue for use on black */
   --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --shadow-card: 0 1px 2px rgba(11, 37, 69, 0.04), 0 8px 24px -12px rgba(43, 125, 233, 0.18);
+  --shadow-card: 0 1px 0 rgb(255 255 255 / 0.05) inset, 0 18px 40px -22px rgb(0 0 0 / 0.85);
 }
 
-html { scroll-behavior: smooth; }
+html { scroll-behavior: smooth; color-scheme: dark; }
 body {
   color: var(--color-ink);
-  /* dark stage: the background video and the analysis sheet sit on it */
+  /* dark stage: the background video sits behind everything */
   background: var(--color-night);
   font-family: var(--font-inter), var(--font-sans);
   -webkit-font-smoothing: antialiased;
@@ -57,6 +57,35 @@ input[type="range"] { accent-color: var(--color-brand-500); }
 /* Background video: hidden for people who prefer reduced motion (the poster image stays) */
 @media (prefers-reduced-motion: reduce) {
   .bg-video { display: none; }
-  .rise { animation: none; }
+  .rise, .fade-in, .stagger > *, .flow-line, details[open] > *:not(summary) { animation: none !important; }
+  .glass, button, summary, [role="tab"] { transition: none !important; transform: none !important; }
   html { scroll-behavior: auto; }
 }
+
+/* ---- Interaction and motion ------------------------------------------------ */
+@keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes pop { from { opacity: 0; transform: translateY(10px) scale(.97); } to { opacity: 1; transform: none; } }
+@keyframes draw { from { stroke-dashoffset: 40; opacity: 0; } to { stroke-dashoffset: 0; opacity: .9; } }
+@keyframes pulse-ring { 0%, 100% { box-shadow: 0 0 0 0 rgb(43 125 233 / .45); } 50% { box-shadow: 0 0 0 8px rgb(43 125 233 / 0); } }
+
+.fade-in { animation: fade .5s ease both; }
+/* Children appear one after another (cards, KPI tiles, rows) */
+.stagger > * { animation: pop .55s cubic-bezier(.2,.7,.2,1) both; }
+.stagger > *:nth-child(1) { animation-delay: .03s; } .stagger > *:nth-child(2) { animation-delay: .1s; }
+.stagger > *:nth-child(3) { animation-delay: .17s; } .stagger > *:nth-child(4) { animation-delay: .24s; }
+.stagger > *:nth-child(5) { animation-delay: .31s; } .stagger > *:nth-child(n+6) { animation-delay: .38s; }
+
+/* Glass cards: lift and glow on hover */
+.glass { transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease; }
+.glass:hover { transform: translateY(-2px); border-color: rgb(90 159 255 / .45); box-shadow: 0 1px 0 rgb(255 255 255 / .06) inset, 0 22px 44px -22px rgb(43 125 233 / .5); }
+
+button, summary, [role="tab"] { transition: transform .15s ease, background-color .25s ease, border-color .25s ease, color .25s ease, box-shadow .25s ease; }
+button:active:not(:disabled), [role="tab"]:active { transform: scale(.97); }
+tbody tr { transition: background-color .2s ease; }
+tbody tr:hover { background-color: rgb(255 255 255 / .04); }
+details > summary { list-style-position: inside; }
+details[open] > *:not(summary) { animation: fade .35s ease both; }
+.flow-line { stroke-dasharray: 6 4; animation: draw .7s ease both; }
+select, input:not([type="range"]):not([type="checkbox"]):not([type="radio"]) { transition: border-color .2s ease, box-shadow .2s ease, background-color .2s ease; }
+select:hover, input:hover { border-color: rgb(90 159 255 / .5); }
+.recharts-legend-wrapper, .recharts-default-legend { color: var(--color-muted); }

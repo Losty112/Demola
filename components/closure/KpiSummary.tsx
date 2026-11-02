@@ -1,6 +1,7 @@
 "use client";
 import type { ScenarioResult, Ward } from "@/lib/closure/types";
 import { STATUS_META, capacityStatus, type CapacityStatus } from "@/lib/closure/status";
+import { AnimatedValue } from "@/components/flow/AnimatedValue";
 import { formatEuro, formatEuroSigned, formatInt } from "@/lib/format";
 
 const TONE: Record<"good" | "warn" | "bad", string> = { good: "text-par", warn: "text-watch", bad: "text-gap" };
@@ -8,9 +9,9 @@ const BAR: Record<"good" | "warn" | "bad", string> = { good: "bg-par", warn: "bg
 
 function KpiCard({ title, value, tone, children }: { title: string; value: string; tone: "good" | "warn" | "bad"; children: React.ReactNode }) {
   return (
-    <article className="flex flex-col rounded-2xl border border-line bg-gradient-to-b from-white to-brand-50/60 p-5 shadow-card">
+    <article className="glass flex flex-col rounded-2xl border border-line bg-gradient-to-b from-white/10 to-white/[0.02] p-5 shadow-card backdrop-blur">
       <h4 className="text-xs font-semibold uppercase tracking-wide text-muted">{title}</h4>
-      <p className={`mt-2 font-display text-4xl leading-none tabular-nums ${TONE[tone]}`}>{value}</p>
+      <p className={`mt-2 font-display text-4xl leading-none tabular-nums ${TONE[tone]}`}><AnimatedValue text={value} /></p>
       <div className="mt-3 space-y-2 text-sm text-muted">{children}</div>
     </article>
   );
@@ -59,7 +60,7 @@ export function KpiSummary({ wards, result }: { wards: Ward[]; result: ScenarioR
 
   return (
     <div className="space-y-4" role="region" aria-label="Key figures for this scenario" aria-live="polite">
-    <div className="grid gap-4 md:grid-cols-3">
+    <div className="stagger grid gap-4 md:grid-cols-3">
       <KpiCard title="Capacity shift" value={`${formatInt(result.bedsAbsorbed)} of ${formatInt(result.bedsImpacted)} beds`} tone={capTone}>
         <div>
           <div className="h-2 overflow-hidden rounded-full bg-brand-100" role="img" aria-label={`${absorbedPct}% of impacted beds absorbed by partner wards`}>
@@ -96,11 +97,11 @@ export function KpiSummary({ wards, result }: { wards: Ward[]; result: ScenarioR
     </div>
 
     {/* Compact strip with the five headline numbers (admissions per year) */}
-    <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-line bg-line sm:grid-cols-5">
+    <dl className="stagger grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-line bg-line sm:grid-cols-5">
       {stats.map((x) => (
-        <div key={x.label} className="bg-white px-4 py-3">
+        <div key={x.label} className="bg-surface px-4 py-3">
           <dt className="text-xs text-muted">{x.label}</dt>
-          <dd className={`font-display text-3xl leading-tight tabular-nums ${x.cls}`}>{x.value}</dd>
+          <dd className={`font-display text-3xl leading-tight tabular-nums ${x.cls}`}><AnimatedValue text={x.value} /></dd>
         </div>
       ))}
     </dl>

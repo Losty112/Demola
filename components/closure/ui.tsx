@@ -61,7 +61,7 @@ export function Field({ label, value, children }: { label: string; value?: strin
     </label>
   );
 }
-export const INPUT = `w-full rounded-lg border border-line bg-white px-2.5 py-1.5 text-sm text-ink ${FOCUS}`;
+export const INPUT = `w-full rounded-lg border border-line bg-white/5 px-2.5 py-1.5 text-sm text-ink ${FOCUS}`;
 
 /** Numbered step header used to give the page its Baseline → Selection → Impact → Plan logic. */
 export function StepHeader({ n, id, title, subtitle }: { n: number; id: string; title: string; subtitle: string }) {

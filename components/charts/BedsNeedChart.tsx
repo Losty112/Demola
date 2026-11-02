@@ -11,7 +11,7 @@ export function BedsNeedChart({ data }: { data: BedsDatum[] }) {
         <CartesianGrid vertical={false} stroke={CHART.grid} />
         <XAxis dataKey="name" tickFormatter={(v: string) => v.split(" – ")[0]} tick={{ fill: CHART.axis, fontSize: 12 }} axisLine={false} tickLine={false} />
         <YAxis tick={{ fill: CHART.axis, fontSize: 12 }} axisLine={false} tickLine={false} />
-        <Tooltip {...tooltipStyle} cursor={{ fill: "#eef6ff" }} />
+        <Tooltip {...tooltipStyle} cursor={{ fill: "rgba(255,255,255,0.06)" }} />
         <Legend wrapperStyle={{ fontSize: 12 }} />
         <Bar dataKey="needed" name="Beds needed at benchmark occupancy" stackId="b" fill={CHART.brand} radius={[0, 0, 0, 0]} />
         <Bar dataKey="surplus" name="Beds above need" stackId="b" fill={CHART.brandLight} radius={[8, 8, 0, 0]} />

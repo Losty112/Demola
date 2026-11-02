@@ -105,7 +105,7 @@ export function ClosureDashboard({ wards: raw, travel, assumptions, defaultSourc
       </div>
 
       {/* ── Step navigation ─────────────────────────────────────────── */}
-      <nav aria-label="Analysis steps" className="sticky top-16 z-20 -mx-4 border-b border-line bg-page/90 px-4 backdrop-blur sm:mx-0 sm:rounded-xl sm:border sm:px-2">
+      <nav aria-label="Analysis steps" className="sticky top-16 z-20 -mx-4 border-b border-line bg-night/80 px-4 backdrop-blur sm:mx-0 sm:rounded-xl sm:border sm:px-2">
         <ol className="flex gap-1 overflow-x-auto py-2">
           {STEPS.map((s, i) => (
             <li key={s.id}>

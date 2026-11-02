@@ -11,7 +11,7 @@ export function OccupancyChart({ data, cap }: { data: { name: string; before: nu
           <CartesianGrid vertical={false} stroke={CHART.grid} />
           <XAxis dataKey="name" tick={{ fill: CHART.axis, fontSize: 11 }} axisLine={false} tickLine={false} />
           <YAxis domain={[0, 100]} unit="%" tick={{ fill: CHART.axis, fontSize: 11 }} axisLine={false} tickLine={false} />
-          <Tooltip {...tooltipStyle} formatter={(v) => `${v}%`} cursor={{ fill: "#eef6ff" }} />
+          <Tooltip {...tooltipStyle} formatter={(v) => `${v}%`} cursor={{ fill: "rgba(255,255,255,0.06)" }} />
           <Legend wrapperStyle={{ fontSize: 12 }} />
           <ReferenceLine y={cap} stroke="#e5484d" strokeDasharray="4 3" label={{ value: `cap ${cap}%`, fill: "#e5484d", fontSize: 11, position: "right" }} />
           <Bar dataKey="before" name="Occupancy before" fill={CHART.bench} radius={[6, 6, 0, 0]} />
