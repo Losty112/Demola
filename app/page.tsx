@@ -11,6 +11,7 @@ import { NetworkTrend } from "@/components/charts/NetworkTrend";
 import { SiteSection } from "@/components/sections/SiteSection";
 import { CompareSection } from "@/components/sections/CompareSection";
 import { YourData } from "@/components/sections/YourData";
+import { ClosureSection } from "@/components/sections/ClosureSection";
 import { DataSection } from "@/components/sections/DataSection";
 import { formatEuroCompact, formatInt } from "@/lib/format";
 
@@ -107,6 +108,10 @@ export default async function HomePage() {
 
       <Section id="compare" title="Compare sites" subtitle="Put sites side by side against the benchmark hospital.">
         <CompareSection sites={sites} benchmark={benchmark} />
+      </Section>
+
+      <Section id="closure" title="If one ward closes, where do its patients go?" subtitle="Four steps: baseline, closure selection, impact, redistribution plan.">
+        <ClosureSection />
       </Section>
 
       <Section id="data" title="Benchmark & data" subtitle="What the benchmark is made of and which assumptions drive the analysis.">

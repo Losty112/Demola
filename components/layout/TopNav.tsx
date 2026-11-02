@@ -6,6 +6,7 @@ const LINKS = [
   { href: "#network", label: "Overview" },
   { href: "#site", label: "Site analysis" },
   { href: "#compare", label: "Compare" },
+  { href: "#closure", label: "Ward closure" },
   { href: "#data", label: "Benchmark & data" },
 ];
 

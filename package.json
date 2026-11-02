@@ -11,7 +11,8 @@
     "test": "tsx --test tests/*.test.ts",
     "db:seed": "tsx --env-file-if-exists=.env.local scripts/seed.ts",
     "db:import": "tsx --env-file-if-exists=.env.local scripts/import-csv.ts",
-    "db:sql": "tsx scripts/generate-seed-sql.ts"
+    "db:sql": "tsx scripts/generate-seed-sql.ts",
+    "build:closure-preview": "node scripts/build-closure-preview.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.118.0",
