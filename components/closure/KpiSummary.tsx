@@ -10,7 +10,7 @@ function KpiCard({ title, value, tone, children }: { title: string; value: strin
   return (
     <article className="flex flex-col rounded-2xl border border-line bg-gradient-to-b from-white to-brand-50/60 p-5 shadow-card">
       <h4 className="text-xs font-semibold uppercase tracking-wide text-muted">{title}</h4>
-      <p className={`mt-2 text-3xl font-semibold tracking-tight tabular-nums ${TONE[tone]}`}>{value}</p>
+      <p className={`mt-2 font-display text-4xl leading-none tabular-nums ${TONE[tone]}`}>{value}</p>
       <div className="mt-3 space-y-2 text-sm text-muted">{children}</div>
     </article>
   );
@@ -100,7 +100,7 @@ export function KpiSummary({ wards, result }: { wards: Ward[]; result: ScenarioR
       {stats.map((x) => (
         <div key={x.label} className="bg-white px-4 py-3">
           <dt className="text-xs text-muted">{x.label}</dt>
-          <dd className={`text-lg font-semibold tabular-nums ${x.cls}`}>{x.value}</dd>
+          <dd className={`font-display text-3xl leading-tight tabular-nums ${x.cls}`}>{x.value}</dd>
         </div>
       ))}
     </dl>

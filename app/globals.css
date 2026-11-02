@@ -1,11 +1,18 @@
 @import "tailwindcss";
 
+/*
+ * Base palette: four colours only.
+ *   black  --color-night / --color-ink      blue  --color-brand-*   (one hue, tints for backgrounds)
+ *   green  --color-par                      white --color-page / --color-surface
+ * Data colours (charts, capacity status yellow/red, series) are separate and live in
+ * components/charts/theme.ts and lib/closure/status.ts.
+ */
 @theme {
-  --color-ink: #0b2545;
-  --color-muted: #5a7090;
-  --color-line: #dbe8f7;
+  --color-ink: #04070d; /* black */
+  --color-muted: #5b6470; /* black at ~65 %, neutral */
+  --color-line: #e3e7ec;
   --color-surface: #ffffff;
-  --color-page: #f3f8ff;
+  --color-page: #ffffff; /* white */
   --color-brand-50: #eef6ff;
   --color-brand-100: #dcebff;
   --color-brand-200: #bcd9ff;
@@ -17,6 +24,8 @@
   --color-par: #12a37a;
   --color-watch: #e8920f;
   --color-gap: #e5484d;
+  --color-night: #04070d;
+  --color-glow: #5a9fff; /* accent blue for use on black */
   --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --shadow-card: 0 1px 2px rgba(11, 37, 69, 0.04), 0 8px 24px -12px rgba(43, 125, 233, 0.18);
 }
@@ -24,14 +33,30 @@
 html { scroll-behavior: smooth; }
 body {
   color: var(--color-ink);
-  background:
-    radial-gradient(1200px 500px at 85% -10%, #d6e8ff 0%, transparent 60%),
-    radial-gradient(900px 400px at -10% 0%, #e3f0ff 0%, transparent 55%),
-    var(--color-page);
-  background-attachment: fixed;
-  font-family: var(--font-sans);
+  /* dark stage: the background video and the analysis sheet sit on it */
+  background: var(--color-night);
+  font-family: var(--font-inter), var(--font-sans);
   -webkit-font-smoothing: antialiased;
 }
 
 input[type="range"] { accent-color: var(--color-brand-500); }
 .recharts-text { font-family: var(--font-sans); }
+
+/* Condensed display type for titles and big figures */
+.font-display { font-family: var(--font-bebas), Impact, "Arial Narrow", sans-serif; letter-spacing: 0.02em; text-transform: uppercase; font-weight: 400; }
+
+/* Thin technical corner marks used on hero panels (echo of the blueprint video) */
+.ticks { position: relative; }
+.ticks::before, .ticks::after { content: ""; position: absolute; width: 14px; height: 14px; border: 1px solid rgba(255,255,255,.55); pointer-events: none; }
+.ticks::before { top: 0; left: 0; border-right: 0; border-bottom: 0; }
+.ticks::after { bottom: 0; right: 0; border-left: 0; border-top: 0; }
+
+@keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+.rise { animation: rise .8s cubic-bezier(.2,.7,.2,1) both; }
+
+/* Background video: hidden for people who prefer reduced motion (the poster image stays) */
+@media (prefers-reduced-motion: reduce) {
+  .bg-video { display: none; }
+  .rise { animation: none; }
+  html { scroll-behavior: auto; }
+}

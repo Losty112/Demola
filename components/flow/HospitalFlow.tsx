@@ -8,6 +8,7 @@ import { OwnerForm } from "./OwnerForm";
 import { BuilderForm, planToSnapshot, type BuildPlan } from "./BuilderForm";
 import { BuildSizing } from "./BuildSizing";
 import { Stepper } from "./fields";
+import { BackgroundVideo } from "./BackgroundVideo";
 
 /** Server-rendered sections handed in from `app/page.tsx` (they need database data). */
 export interface FlowSlots {
@@ -76,62 +77,75 @@ export function HospitalFlow({ benchmark, settings, scenario, slots }: {
     else setSaveMsg({ ok: false, text: (await res.json().catch(() => null))?.error ?? "Could not save." });
   };
 
-  if (stage === "start") return <StartScreen onChoose={(p) => { setPath(p); goto("data"); }} />;
+  if (stage === "start") return (
+    <>
+      <BackgroundVideo dim="hero" />
+      <StartScreen onChoose={(p) => { setPath(p); goto("data"); }} />
+    </>
+  );
 
   const labels = ["Choose", "Enter data", "Overview"];
   const name = path === "own" ? own?.name : build?.name;
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <Stepper current={stage === "data" ? 1 : 2} labels={labels} />
-        <span className="rounded-full bg-brand-50 px-3 py-1 text-xs font-medium text-brand-700">{path === "own" ? "I own a hospital" : "I want to build a hospital"}</span>
-      </div>
-
-      {stage === "data" && path === "own" && (
-        <OwnerForm benchmark={benchmark} initial={own ?? undefined} onBack={reset} onSubmit={(n, s) => { setOwn({ name: n, snap: s }); goto("overview"); }} />
-      )}
-      {stage === "data" && path === "build" && (
-        <BuilderForm benchmark={benchmark} settings={settings} initial={build ?? undefined} onBack={reset} onSubmit={(n, p) => { setBuild({ name: n, plan: p }); goto("overview"); }} />
-      )}
-
-      {stage === "overview" && name && (
-        <div className="space-y-5">
-          <div className="flex flex-wrap items-end justify-between gap-3">
-            <div>
-              <h1 className="text-2xl font-semibold tracking-tight">Overview · {name}</h1>
-              <p className="text-sm text-muted">{path === "own" ? "How your hospital compares with the benchmark, and what a change would do." : "What the area needs, and how the plan compares with the benchmark."}</p>
-            </div>
-            <div className="flex flex-wrap items-center gap-2">
-              {path === "own" && <button type="button" onClick={save} className="rounded-xl bg-white px-4 py-2 text-sm font-semibold text-brand-600 ring-1 ring-brand-200 hover:bg-brand-50">Save to network</button>}
-              <button type="button" onClick={() => goto("data")} className="rounded-xl bg-white px-4 py-2 text-sm font-semibold text-brand-600 ring-1 ring-brand-200 hover:bg-brand-50">Edit data</button>
-              <button type="button" onClick={reset} className="rounded-xl px-4 py-2 text-sm font-medium text-muted hover:bg-brand-50">Start over</button>
-            </div>
-          </div>
-          {saveMsg && <p role="status" className={`text-sm ${saveMsg.ok ? "text-par" : "text-gap"}`}>{saveMsg.text}</p>}
-
-          {path === "own" && own && (
-            <Tabs label="Overview sections" tabs={[
-              { id: "hospital", label: "Your hospital", content: <SiteWorkbench key={JSON.stringify(own)} name={own.name} history={[own.snap]} benchmark={benchmark} settings={settings} initialScenario={scenario} /> },
-              { id: "closure", label: "Ward closure", content: slots.closure },
-              { id: "network", label: "Network", content: slots.network },
-              { id: "sites", label: "Sites & compare", content: <div className="space-y-8">{slots.sites}{slots.compare}</div> },
-              { id: "data", label: "Benchmark & data", content: slots.data },
-            ]} />
-          )}
-          {path === "build" && build && (
-            <Tabs label="Overview sections" tabs={[
-              { id: "plan", label: "Your plan", content: (
-                <div className="space-y-6">
-                  <BuildSizing plan={build.plan} />
-                  <SiteWorkbench key={JSON.stringify(build)} name={build.name} history={[planToSnapshot(build.plan)]} benchmark={benchmark} settings={settings} initialScenario={scenario} plan />
+    <>
+      <BackgroundVideo dim="reading" />
+      {/* Light "analysis sheet" floating over the dimmed video: keeps every chart and table readable */}
+      <div className="mx-auto w-full max-w-[1280px] px-3 pb-16 pt-24 sm:px-6">
+        <div className="rounded-[28px] bg-page p-4 shadow-2xl ring-1 ring-white/10 sm:p-8">
+              <div className="space-y-6">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <Stepper current={stage === "data" ? 1 : 2} labels={labels} />
+                  <span className="rounded-full bg-brand-50 px-3 py-1 text-xs font-medium text-brand-700">{path === "own" ? "I own a hospital" : "I want to build a hospital"}</span>
                 </div>
-              ) },
-              { id: "data", label: "Benchmark & data", content: slots.data },
-            ]} />
-          )}
+
+                {stage === "data" && path === "own" && (
+                  <OwnerForm benchmark={benchmark} initial={own ?? undefined} onBack={reset} onSubmit={(n, s) => { setOwn({ name: n, snap: s }); goto("overview"); }} />
+                )}
+                {stage === "data" && path === "build" && (
+                  <BuilderForm benchmark={benchmark} settings={settings} initial={build ?? undefined} onBack={reset} onSubmit={(n, p) => { setBuild({ name: n, plan: p }); goto("overview"); }} />
+                )}
+
+                {stage === "overview" && name && (
+                  <div className="space-y-5">
+                    <div className="flex flex-wrap items-end justify-between gap-3">
+                      <div>
+                        <h1 className="font-display text-4xl tracking-wide text-ink sm:text-5xl">Overview · {name}</h1>
+                        <p className="text-sm text-muted">{path === "own" ? "How your hospital compares with the benchmark, and what a change would do." : "What the area needs, and how the plan compares with the benchmark."}</p>
+                      </div>
+                      <div className="flex flex-wrap items-center gap-2">
+                        {path === "own" && <button type="button" onClick={save} className="rounded-xl bg-white px-4 py-2 text-sm font-semibold text-brand-600 ring-1 ring-brand-200 hover:bg-brand-50">Save to network</button>}
+                        <button type="button" onClick={() => goto("data")} className="rounded-xl bg-white px-4 py-2 text-sm font-semibold text-brand-600 ring-1 ring-brand-200 hover:bg-brand-50">Edit data</button>
+                        <button type="button" onClick={reset} className="rounded-xl px-4 py-2 text-sm font-medium text-muted hover:bg-brand-50">Start over</button>
+                      </div>
+                    </div>
+                    {saveMsg && <p role="status" className={`text-sm ${saveMsg.ok ? "text-par" : "text-gap"}`}>{saveMsg.text}</p>}
+
+                    {path === "own" && own && (
+                      <Tabs label="Overview sections" tabs={[
+                        { id: "hospital", label: "Your hospital", content: <SiteWorkbench key={JSON.stringify(own)} name={own.name} history={[own.snap]} benchmark={benchmark} settings={settings} initialScenario={scenario} /> },
+                        { id: "closure", label: "Ward closure", content: slots.closure },
+                        { id: "network", label: "Network", content: slots.network },
+                        { id: "sites", label: "Sites & compare", content: <div className="space-y-8">{slots.sites}{slots.compare}</div> },
+                        { id: "data", label: "Benchmark & data", content: slots.data },
+                      ]} />
+                    )}
+                    {path === "build" && build && (
+                      <Tabs label="Overview sections" tabs={[
+                        { id: "plan", label: "Your plan", content: (
+                          <div className="space-y-6">
+                            <BuildSizing plan={build.plan} />
+                            <SiteWorkbench key={JSON.stringify(build)} name={build.name} history={[planToSnapshot(build.plan)]} benchmark={benchmark} settings={settings} initialScenario={scenario} plan />
+                          </div>
+                        ) },
+                        { id: "data", label: "Benchmark & data", content: slots.data },
+                      ]} />
+                    )}
+                  </div>
+                )}
+              </div>
         </div>
-      )}
-    </div>
+      </div>
+    </>
   );
 }

@@ -1,8 +1,13 @@
 import type { Metadata } from "next";
+import { Bebas_Neue, Inter } from "next/font/google";
 import "./globals.css";
 import { TopNav } from "@/components/layout/TopNav";
 import { Footer } from "@/components/layout/Footer";
 import { getDataOrigin } from "@/lib/db/repository";
+
+const inter = Inter({ subsets: ["latin", "latin-ext"], variable: "--font-inter", display: "swap" });
+/** Condensed display face for titles and big figures (see `.font-display` in globals.css). */
+const bebas = Bebas_Neue({ subsets: ["latin", "latin-ext"], weight: "400", variable: "--font-bebas", display: "swap" });
 
 export const metadata: Metadata = {
   title: "Benchmark Hospital",
@@ -12,10 +17,11 @@ export const metadata: Metadata = {
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const origin = await getDataOrigin();
   return (
-    <html lang="en">
+    <html lang="en" className={`${inter.variable} ${bebas.variable}`}>
       <body className="min-h-screen antialiased">
         <TopNav demo={origin === "demo"} />
-        <main className="mx-auto w-full max-w-[1240px] px-4 pb-16 pt-8 sm:px-6">{children}</main>
+        {/* Full width: the page flow (hero or analysis sheet) sets its own container */}
+        <main>{children}</main>
         <Footer demo={origin === "demo"} />
       </body>
     </html>
