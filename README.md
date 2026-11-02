@@ -33,7 +33,12 @@ Import the repo at vercel.com/new, then add the Supabase integration (Storage �
 2. `npm run db:import -- yourfile.csv --replace` (`--replace` removes the demo sites and their detail data).
 3. Edit benchmark values and decision thresholds in the `benchmark_values` and `settings` tables (Supabase *Table Editor*).
 
-The app is one page (`/`) with four sections: overview, site analysis, compare, benchmark & data. The old `/compare`, `/data` and `/sites/*` URLs redirect to it.
+The app is one page (`/`) with three stages and no sub-pages: **1. Choose** ("I own a hospital" / "I want to build a hospital") → **2. Enter data** (a different form for each choice) → **3. Overview** (tabs).
+
+- *Own:* your hospital vs. the benchmark and what-if scenarios, **ward closure** dashboard (baseline → selection → impact → redistribution plan), network overview, sites & compare, benchmark & data.
+- *Build:* beds, floor area and facility cost the catchment needs (with a demand sensitivity table), plan vs. benchmark, benchmark & data.
+
+The old `/compare`, `/data` and `/sites/*` URLs redirect to `/`. `npm run build:closure-preview` writes a self-contained `public/closure-preview.html` of the closure dashboard.
 
 JSON endpoints: `/api/sites`, `/api/sites/[slug]`, `/api/sites/[slug]/stats`, `/api/benchmark`.
 
