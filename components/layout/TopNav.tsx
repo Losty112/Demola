@@ -1,18 +1,18 @@
 "use client";
 import Link from "next/link";
 
-/** Slim header: logo and prototype badge only. Navigation happens inside the page flow. */
+/** Floating pill header over the hero / dark stage. Navigation happens inside the page flow. */
 export function TopNav({ demo }: { demo: boolean }) {
   return (
-    <header className="sticky top-0 z-30 border-b border-line bg-white/80 backdrop-blur">
-      <div className="mx-auto flex h-16 max-w-[1240px] items-center gap-6 px-4 sm:px-6">
-        <Link href="/" className="flex items-center gap-2.5 font-semibold tracking-tight">
-          <span className="grid h-8 w-8 place-items-center rounded-xl bg-gradient-to-br from-brand-400 to-brand-600 text-white shadow-sm">
-            <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
+    <header className="pointer-events-none fixed inset-x-0 top-0 z-40 flex justify-center px-4 pt-4">
+      <div className="pointer-events-auto flex w-full max-w-[1240px] items-center gap-4 rounded-full border border-white/15 bg-night/55 px-4 py-2 text-white shadow-lg backdrop-blur-md sm:px-5">
+        <Link href="/" className="flex items-center gap-2.5 text-sm font-semibold tracking-wide focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-glow">
+          <span className="grid h-7 w-7 place-items-center rounded-full border border-white/40">
+            <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
           </span>
           Benchmark Hospital
         </Link>
-        {demo && <span className="ml-auto rounded-full border border-brand-200 bg-brand-50 px-3 py-1 text-xs font-medium text-brand-600">Prototype · illustrative data</span>}
+        {demo && <span className="ml-auto rounded-full border border-white/25 px-3 py-1 text-[11px] font-medium uppercase tracking-widest text-white/80">Prototype · illustrative data</span>}
       </div>
     </header>
   );

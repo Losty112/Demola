@@ -69,7 +69,7 @@ export function StepHeader({ n, id, title, subtitle }: { n: number; id: string; 
     <div className="flex items-start gap-3">
       <span aria-hidden="true" className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-brand-500 text-sm font-bold text-white">{n}</span>
       <div>
-        <h3 id={id} className="text-xl font-semibold tracking-tight text-ink">{title}</h3>
+        <h3 id={id} className="font-display text-3xl tracking-wide text-ink">{title}</h3>
         <p className="text-sm text-muted">{subtitle}</p>
       </div>
     </div>
