@@ -19,7 +19,7 @@ export function ScenarioChart({ data }: { data: ScenarioDatum[] }) {
               <CartesianGrid vertical={false} stroke={CHART.grid} />
               <XAxis dataKey="name" tick={{ fill: CHART.axis, fontSize: 11 }} axisLine={false} tickLine={false} />
               <YAxis hide />
-              <Tooltip {...tooltipStyle} formatter={(v) => c.fmt(Number(v))} cursor={{ fill: "#eef6ff" }} />
+              <Tooltip {...tooltipStyle} formatter={(v) => c.fmt(Number(v))} cursor={{ fill: "rgba(255,255,255,0.06)" }} />
               <Bar dataKey={c.key} radius={[8, 8, 0, 0]} barSize={36}>
                 {data.map((d) => <Cell key={d.name} fill={c.color} fillOpacity={0.85} />)}
                 <LabelList dataKey={c.key} position="top" formatter={(v) => c.fmt(Number(v))} fill={CHART.navy} fontSize={12} />

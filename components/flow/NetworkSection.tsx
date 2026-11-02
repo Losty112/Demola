@@ -20,13 +20,13 @@ export function NetworkSection({ net }: { net: Network }) {
 
   return (
     <div className="space-y-5">
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="stagger grid gap-4 sm:grid-cols-3">
         <Kpi label="Average vs. benchmark" value={`${formatInt(avg)}%`} hint={`${sites.length} sites · mean of all`} tone={avg >= 90 ? "good" : avg >= 75 ? "warn" : "bad"} />
         <Kpi label="Beds above need" value={formatInt(surplus)} hint="at benchmark occupancy" />
         <Kpi label="Cost gap to benchmark" value={formatEuroCompact(costGap)} hint="per year, all sites" tone="warn" />
       </div>
 
-      <div className="grid gap-5 xl:grid-cols-2">
+      <div className="stagger grid gap-5 xl:grid-cols-2">
         <Card title="Site ranking" subtitle="Average of the seven metrics, as % of the benchmark">
           <NetworkRanking data={sites.map((s) => ({ name: s.name, average: Math.round(s.analysis.average), status: statusOf(s.analysis.average, settings) }))} />
         </Card>

@@ -23,7 +23,7 @@ export function OccupancyCostBubble({ data, benchOccupancy, benchCost }: { data:
           const d = payload?.[0]?.payload as BubbleDatum | undefined;
           if (!d) return null;
           return (
-            <div className="rounded-xl border border-line bg-white p-2.5 text-xs shadow-card">
+            <div className="rounded-xl border border-line bg-night p-2.5 text-xs shadow-card">
               <div className="font-semibold">{d.name}</div>
               <div>Occupancy {d.occupancy}% · Cost €{d.cost}/m² · {d.beds} beds</div>
             </div>

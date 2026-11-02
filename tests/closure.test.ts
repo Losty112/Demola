@@ -33,3 +33,13 @@ test("moving 0 % displaces nobody", () => {
   assert.equal(r.displaced, 0);
   assert.equal(r.verdict.k, "ok");
 });
+
+import { tileLat, tileLon, tileX, tileY, tilesCovering } from "../lib/closure/geo";
+
+test("map tiles: Prague centre is tile 10/553/346 and tile edges bracket the point", () => {
+  assert.equal(tileX(14.4378, 10), 553);
+  assert.equal(tileY(50.0755, 10), 346);
+  const [t] = tilesCovering({ north: 50.0755, south: 50.0755, west: 14.4378, east: 14.4378 }, 12);
+  assert.ok(t.west <= 14.4378 && 14.4378 <= t.east && t.south <= 50.0755 && 50.0755 <= t.north);
+  assert.ok(Math.abs(tileLon(1, 1) - 0) < 1e-9 && Math.abs(tileLat(1, 1)) < 1e-9);
+});

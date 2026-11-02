@@ -37,7 +37,7 @@ export function ScenarioControls({ wards, cfg, active, onActive, onChange, onCop
         <legend className="mb-1 text-sm text-muted">What happens to it</legend>
         <div className="grid gap-2">
           {TYPES.map((t) => (
-            <label key={t.value} className={`flex cursor-pointer items-start gap-2 rounded-lg border p-2.5 text-sm has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-brand-500 ${cfg.type === t.value ? "border-brand-400 bg-brand-50" : "border-line bg-white hover:bg-brand-50/60"}`}>
+            <label key={t.value} className={`flex cursor-pointer items-start gap-2 rounded-lg border p-2.5 text-sm has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-brand-500 ${cfg.type === t.value ? "border-brand-400 bg-brand-50" : "border-line bg-white/5 hover:bg-brand-50/60"}`}>
               <input type="radio" name="scenario-type" className="mt-1 accent-brand-500" checked={cfg.type === t.value} onChange={() => onChange({ type: t.value })} />
               <span><span className="block font-medium text-ink">{t.label}</span><span className="text-xs text-muted">{t.hint}</span></span>
             </label>
@@ -86,7 +86,7 @@ export function ScenarioControls({ wards, cfg, active, onActive, onChange, onCop
         </div>
       </details>
 
-      <button type="button" onClick={onCopy} className={`w-full rounded-lg border border-brand-200 bg-white py-2 text-sm font-medium text-brand-700 hover:bg-brand-50 ${FOCUS}`}>
+      <button type="button" onClick={onCopy} className={`w-full rounded-lg border border-brand-200 bg-white/5 py-2 text-sm font-medium text-brand-700 hover:bg-brand-50 ${FOCUS}`}>
         Copy to scenario {active === "A" ? "B" : "A"}
       </button>
     </div>

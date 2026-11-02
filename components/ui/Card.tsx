@@ -2,7 +2,7 @@ export function Card({ title, subtitle, action, children, className = "" }: {
   title?: string; subtitle?: string; action?: React.ReactNode; children: React.ReactNode; className?: string;
 }) {
   return (
-    <section className={`min-w-0 rounded-2xl border border-line bg-surface p-5 shadow-card ${className}`}>
+    <section className={`glass min-w-0 rounded-2xl border border-line bg-surface p-5 shadow-card backdrop-blur-md ${className}`}>
       {(title || action) && (
         <header className="mb-4 flex items-start justify-between gap-3">
           <div>

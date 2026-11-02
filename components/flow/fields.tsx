@@ -1,7 +1,7 @@
 "use client";
 import type { ReactNode } from "react";
 
-export const INPUT = "w-full rounded-lg border border-line bg-white px-3 py-2 text-sm tabular-nums focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-brand-500";
+export const INPUT = "w-full rounded-lg border border-line bg-white/5 px-3 py-2 text-sm tabular-nums focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-brand-500";
 
 /** Labelled number/text input with an optional hint line (unit, benchmark). */
 export function FormField({ label, hint, children }: { label: string; hint?: ReactNode; children: ReactNode }) {

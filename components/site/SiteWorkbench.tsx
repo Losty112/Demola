@@ -84,7 +84,7 @@ export function SiteWorkbench({ name, history, benchmark, settings, initialScena
         </div>
         )}
 
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="stagger grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           <Kpi label="Average vs. benchmark" value={`${formatInt(analysis.average)}%`} hint={`${analysis.gaps} gap${analysis.gaps === 1 ? "" : "s"} · weakest: ${METRIC_BY_KEY[analysis.worst.key].short}`}
             tone={analysis.average >= settings.goodAverage ? "good" : analysis.average >= settings.closeAverage ? "warn" : "bad"} />
           <Kpi label="Beds needed" value={formatInt(analysis.bedsNeeded)} hint={analysis.surplusBeds > 0 ? `${formatInt(analysis.surplusBeds)} beds above need` : analysis.surplusBeds < 0 ? `${formatInt(-analysis.surplusBeds)} beds short` : "matches need"} />
