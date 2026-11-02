@@ -102,7 +102,7 @@ export function NetworkMap({ wards, result, view, focusId, onFocus, onSelect, se
             <circle cx={x} cy={y} r={Math.max(r + 8, 18)} fill="transparent" />
             {active && <circle cx={x} cy={y} r={r + 5} fill="none" stroke="#184f9f" strokeWidth={2} />}
             {hollow ? (
-              <circle cx={x} cy={y} r={r} fill="#fff" stroke="#0b2545" strokeWidth={2} strokeDasharray={closed ? undefined : "4 3"} />
+              <circle cx={x} cy={y} r={r} fill="#fff" stroke="#04070d" strokeWidth={2} strokeDasharray={closed ? undefined : "4 3"} />
             ) : (
               <circle cx={x} cy={y} r={r} fill={meta.fill} fillOpacity={0.9} stroke="#fff" strokeWidth={1.5} />
             )}
@@ -111,14 +111,14 @@ export function NetworkMap({ wards, result, view, focusId, onFocus, onSelect, se
             {hollow && closed && (
               <path d={`M${x - r * 0.5},${y - r * 0.5} L${x + r * 0.5},${y + r * 0.5} M${x + r * 0.5},${y - r * 0.5} L${x - r * 0.5},${y + r * 0.5}`} stroke="#e5484d" strokeWidth={2.5} strokeLinecap="round" />
             )}
-            <text x={left ? x - r - 6 : x + r + 6} y={y + 4} textAnchor={left ? "end" : "start"} fontSize={compact ? 11 : 12} fontWeight={600} fill="#0b2545" pointerEvents="none"
-              style={{ paintOrder: "stroke", stroke: "#f3f8ff", strokeWidth: 3 }}>
+            <text x={left ? x - r - 6 : x + r + 6} y={y + 4} textAnchor={left ? "end" : "start"} fontSize={compact ? 11 : 12} fontWeight={600} fill="#04070d" pointerEvents="none"
+              style={{ paintOrder: "stroke", stroke: "#ffffff", strokeWidth: 3 }}>
               {w.short}
             </text>
             {/* the one extra line of detail appears only for the focused ward */}
             {active && !compact && (
-              <text x={left ? x - r - 6 : x + r + 6} y={y + 19} textAnchor={left ? "end" : "start"} fontSize={10.5} fill="#5a7090" pointerEvents="none"
-                style={{ paintOrder: "stroke", stroke: "#f3f8ff", strokeWidth: 3 }}>
+              <text x={left ? x - r - 6 : x + r + 6} y={y + 19} textAnchor={left ? "end" : "start"} fontSize={10.5} fill="#5b6470" pointerEvents="none"
+                style={{ paintOrder: "stroke", stroke: "#ffffff", strokeWidth: 3 }}>
                 {recv && isAfter ? `+${formatInt(recv.total)} → ${Math.round(recv.occAfter * 100)}%` : `${Math.round(occOf(w) * 100)}%`}
               </text>
             )}

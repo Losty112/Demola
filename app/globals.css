@@ -1,11 +1,18 @@
 @import "tailwindcss";
 
+/*
+ * Base palette: four colours only.
+ *   black  --color-night / --color-ink      blue  --color-brand-*   (one hue, tints for backgrounds)
+ *   green  --color-par                      white --color-page / --color-surface
+ * Data colours (charts, capacity status yellow/red, series) are separate and live in
+ * components/charts/theme.ts and lib/closure/status.ts.
+ */
 @theme {
-  --color-ink: #0b2545;
-  --color-muted: #5a7090;
-  --color-line: #dbe8f7;
+  --color-ink: #04070d; /* black */
+  --color-muted: #5b6470; /* black at ~65 %, neutral */
+  --color-line: #e3e7ec;
   --color-surface: #ffffff;
-  --color-page: #f3f8ff;
+  --color-page: #ffffff; /* white */
   --color-brand-50: #eef6ff;
   --color-brand-100: #dcebff;
   --color-brand-200: #bcd9ff;
@@ -18,8 +25,7 @@
   --color-watch: #e8920f;
   --color-gap: #e5484d;
   --color-night: #04070d;
-  --color-night-2: #0a1220;
-  --color-glow: #35c3ff;
+  --color-glow: #5a9fff; /* accent blue for use on black */
   --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --shadow-card: 0 1px 2px rgba(11, 37, 69, 0.04), 0 8px 24px -12px rgba(43, 125, 233, 0.18);
 }
