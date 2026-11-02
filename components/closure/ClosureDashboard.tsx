@@ -16,9 +16,9 @@ type ViewMode = "baseline" | "after" | "split";
 type ScenarioKey = "A" | "B";
 
 const VERDICT_STYLE = {
-  ok: { box: "border-par/40 bg-par/10", dot: "bg-par", glyph: "✓" },
-  cond: { box: "border-watch/40 bg-watch/10", dot: "bg-watch", glyph: "!" },
-  no: { box: "border-gap/40 bg-gap/10", dot: "bg-gap", glyph: "✕" },
+  ok: { box: "border-par/40 solid-par", dot: "bg-par", glyph: "✓" },
+  cond: { box: "border-watch/40 solid-watch", dot: "bg-watch", glyph: "!" },
+  no: { box: "border-gap/40 solid-gap", dot: "bg-gap", glyph: "✕" },
 } as const;
 
 const STEPS = [
@@ -105,7 +105,7 @@ export function ClosureDashboard({ wards: raw, travel, assumptions, defaultSourc
       </div>
 
       {/* ── Step navigation ─────────────────────────────────────────── */}
-      <nav aria-label="Analysis steps" className="sticky top-16 z-20 -mx-4 border-b border-line bg-night/80 px-4 backdrop-blur sm:mx-0 sm:rounded-xl sm:border sm:px-2">
+      <nav aria-label="Analysis steps" className="sticky top-16 z-20 -mx-4 border-b border-line bg-night px-4 sm:mx-0 sm:rounded-xl sm:border sm:px-2">
         <ol className="flex gap-1 overflow-x-auto py-2">
           {STEPS.map((s, i) => (
             <li key={s.id}>

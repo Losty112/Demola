@@ -24,10 +24,10 @@ interface Props {
 }
 
 const VERDICT_STYLE = {
-  good: "border-par/40 bg-par/5 text-par",
-  improve: "border-watch/40 bg-watch/5 text-watch",
-  restructure: "border-watch/50 bg-watch/10 text-watch",
-  close: "border-gap/40 bg-gap/5 text-gap",
+  good: "border-par/40 solid-par text-par",
+  improve: "border-watch/40 solid-watch text-watch",
+  restructure: "border-watch/50 solid-watch text-watch",
+  close: "border-gap/40 solid-gap text-gap",
 } as const;
 
 export function SiteWorkbench({ name, history, benchmark, settings, initialScenario, plan = false }: Props) {

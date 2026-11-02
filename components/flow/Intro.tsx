@@ -14,6 +14,8 @@ export function Intro() {
     let seen = false;
     try { seen = sessionStorage.getItem("intro-seen") === "1"; sessionStorage.setItem("intro-seen", "1"); } catch { /* storage blocked: just play it */ }
     const skip = seen || window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const root = document.documentElement;
+    if (!skip) root.dataset.intro = "playing"; // the count-up numbers wait for this to end
     const start = performance.now(), dur = 1400;
     let raf = 0;
     const tick = (t: number) => {
@@ -21,10 +23,10 @@ export function Intro() {
       const p = Math.min(1, (t - start) / dur);
       setPct(Math.round((1 - Math.pow(1 - p, 3)) * 100));
       if (p < 1) raf = requestAnimationFrame(tick);
-      else { setFade(true); setTimeout(() => setGone(true), 700); }
+      else { setFade(true); delete root.dataset.intro; window.dispatchEvent(new Event("intro:done")); setTimeout(() => setGone(true), 700); }
     };
     raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
+    return () => { cancelAnimationFrame(raf); delete root.dataset.intro; };
   }, []);
 
   if (gone) return null;
