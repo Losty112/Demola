@@ -18,7 +18,7 @@ export function CompareSection({ sites, benchmark }: { sites: NetworkSite[]; ben
       <div className="flex flex-wrap gap-1.5" role="group" aria-label="Sites to compare">
         {sites.map((s) => (
           <button key={s.slug} type="button" aria-pressed={slugs.includes(s.slug)} onClick={() => toggle(s.slug)}
-            className={`rounded-full px-3.5 py-1.5 text-xs font-medium ${slugs.includes(s.slug) ? "bg-brand-500 text-white" : "bg-white/5 text-brand-700 ring-1 ring-brand-200 hover:bg-brand-50"}`}>
+            className={`rounded-full px-3.5 py-1.5 text-xs font-medium ${slugs.includes(s.slug) ? "bg-brand-500 text-white" : "bg-panel text-brand-700 ring-1 ring-brand-200 hover:bg-brand-50"}`}>
             {s.name.split(" – ")[0]}
           </button>
         ))}

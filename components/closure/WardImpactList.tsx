@@ -49,7 +49,7 @@ export function WardImpactList({ wards, result, view, selectedId, onSelect, onHo
     const panelId = `ward-panel-${w.id}`;
     const status = capacityStatus(occ);
     return (
-      <li className={`rounded-xl border bg-white/5 ${open ? "border-brand-300 shadow-card" : "border-line"}`} onMouseEnter={() => onHover(w.id)} onMouseLeave={() => onHover(null)}>
+      <li className={`rounded-xl border bg-panel ${open ? "border-brand-300 shadow-card" : "border-line"}`} onMouseEnter={() => onHover(w.id)} onMouseLeave={() => onHover(null)}>
         <button type="button" aria-expanded={open} aria-controls={panelId} onClick={() => onSelect(open ? null : w.id)}
           className={`grid w-full grid-cols-[1fr_auto] items-center gap-x-3 gap-y-2 rounded-xl px-4 py-3 text-left sm:grid-cols-[10rem_1fr_auto_auto] ${FOCUS}`}>
           <span className="font-semibold text-ink">{w.short}<span className="block text-xs font-normal text-muted">{w.beds} beds</span></span>
@@ -87,9 +87,9 @@ export function WardImpactList({ wards, result, view, selectedId, onSelect, onHo
   return (
     <div className="space-y-3">
       <ul className="space-y-2">{receiving.map((r) => <Row key={r.w.id} {...r} />)}</ul>
-      {receiving.length === 0 && <p className="rounded-xl border border-line bg-white/5 p-4 text-sm text-muted">No ward receives patients in this scenario.</p>}
+      {receiving.length === 0 && <p className="rounded-xl border border-line bg-panel p-4 text-sm text-muted">No ward receives patients in this scenario.</p>}
       {untouched.length > 0 && (
-        <details className="rounded-xl border border-line bg-white/5">
+        <details className="rounded-xl border border-line bg-panel">
           <summary className={`cursor-pointer select-none rounded-xl px-4 py-3 text-sm font-medium text-brand-600 ${FOCUS}`}>
             {untouched.length} other {untouched.length === 1 ? "ward" : "wards"} not affected
           </summary>

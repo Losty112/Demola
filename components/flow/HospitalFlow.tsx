@@ -36,7 +36,7 @@ function Tabs({ tabs, label }: { tabs: { id: string; label: string; content: Rea
   };
   return (
     <div className="space-y-5">
-      <div role="tablist" aria-label={label} onKeyDown={onKey} className="flex gap-1 overflow-x-auto rounded-xl border border-line bg-white/5 p-1">
+      <div role="tablist" aria-label={label} onKeyDown={onKey} className="flex gap-1 overflow-x-auto rounded-xl border border-line bg-panel p-1">
         {tabs.map((t) => (
           <button key={t.id} id={`${uid}-tab-${t.id}`} role="tab" type="button" aria-selected={t.id === active} aria-controls={`${uid}-panel`} tabIndex={t.id === active ? 0 : -1}
             onClick={() => setActive(t.id)}
@@ -94,7 +94,7 @@ export function HospitalFlow({ benchmark, settings, scenario, slots }: {
 
   const labels = ["Choose", "Enter data", "Overview"];
   const name = path === "own" ? own?.name : build?.name;
-  const ghost = "rounded-xl border border-brand-200 bg-white/5 px-4 py-2 text-sm font-semibold text-brand-700 backdrop-blur hover:border-brand-400 hover:bg-brand-100";
+  const ghost = "rounded-xl border border-brand-200 bg-panel px-4 py-2 text-sm font-semibold text-brand-700 backdrop-blur hover:border-brand-400 hover:bg-brand-100";
 
   return (
     <>
@@ -103,7 +103,7 @@ export function HospitalFlow({ benchmark, settings, scenario, slots }: {
       <div className="mx-auto w-full max-w-[1280px] space-y-6 px-4 pb-20 pt-24 sm:px-6">
         <div className="fade-in flex flex-wrap items-center justify-between gap-3">
           <Stepper current={stage === "data" ? 1 : 2} labels={labels} />
-          <span className="rounded-full border border-brand-200 bg-brand-50 px-3 py-1 text-xs font-medium text-brand-700">{path === "own" ? "I own a hospital" : "I want to build a hospital"}</span>
+          <span className="rounded-full border border-brand-200 bg-panel px-3 py-1 text-xs font-medium text-brand-700">{path === "own" ? "I own a hospital" : "I want to build a hospital"}</span>
         </div>
 
         {/* keyed by stage: each stage animates in when you click through */}

@@ -2,7 +2,6 @@
 import { WARDS } from "@/lib/closure/data";
 import { enrichWard } from "@/lib/closure/engine";
 import { CountUp } from "./CountUp";
-import { FloorPlan } from "./FloorPlan";
 import { Intro } from "./Intro";
 
 export type Path = "own" | "build";
@@ -49,21 +48,16 @@ export function StartScreen({ onChoose }: { onChoose: (p: Path) => void }) {
         </div>
       </div>
 
-      {/* Bottom bar: floor plan on a light panel, figures on a dark one (the colours flip on hover, like the day/night switch in the reference) */}
-      <div className="rise group mx-auto grid w-full max-w-[1240px] md:grid-cols-[minmax(240px,1fr)_2.2fr]" style={{ animationDelay: "0.85s" }}>
-        <div className="ticks hidden bg-white p-4 text-night transition-colors duration-700 group-hover:bg-night group-hover:text-white md:block">
-          <FloorPlan className="h-28 w-full" />
-        </div>
-        <dl className="ticks grid grid-cols-3 gap-2 bg-night/90 px-5 py-4 backdrop-blur-md transition-colors duration-700 group-hover:bg-white group-hover:text-night sm:px-8">
-          {stats.map((s) => (
-            <div key={s.label}>
-              <dt className="text-[10px] uppercase leading-tight tracking-widest text-white/55 group-hover:text-night/60">{s.label}</dt>
-              <dd className="font-display mt-1 text-4xl leading-none sm:text-6xl">{s.value}</dd>
-              <dd className="mt-1 hidden text-xs text-white/50 group-hover:text-night/55 sm:block">{s.hint}</dd>
-            </div>
-          ))}
-        </dl>
-      </div>
+      {/* Only the figures, centred. No panel behind them: they count up slowly once the loader is gone */}
+      <dl className="rise mx-auto grid w-full max-w-[1000px] grid-cols-3 gap-4 px-5 pb-12 pt-4 text-center [text-shadow:0_2px_24px_rgb(0_0_0/0.8)] sm:px-8" style={{ animationDelay: "0.85s" }}>
+        {stats.map((s) => (
+          <div key={s.label}>
+            <dd className="font-display text-5xl leading-none sm:text-7xl lg:text-8xl">{s.value}</dd>
+            <dt className="mt-2 text-[10px] uppercase leading-tight tracking-[0.25em] text-white/70 sm:text-xs">{s.label}</dt>
+            <dd className="mt-1 hidden text-xs text-white/55 sm:block">{s.hint}</dd>
+          </div>
+        ))}
+      </dl>
     </section>
   );
 }

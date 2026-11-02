@@ -7,7 +7,7 @@ export function TopNav({ demo }: { demo: boolean }) {
   const pathname = usePathname();
   return (
     <header className="pointer-events-none fixed inset-x-0 top-0 z-40 flex justify-center px-4 pt-4">
-      <div className="pointer-events-auto flex w-full max-w-[1240px] items-center gap-4 rounded-full border border-white/15 bg-night/55 px-4 py-2 text-white shadow-lg backdrop-blur-md sm:px-5">
+      <div className="pointer-events-auto flex w-full max-w-[1240px] items-center gap-4 rounded-full border border-white/15 bg-night/90 px-4 py-2 text-white shadow-lg backdrop-blur-md sm:px-5">
         <Link href="/" aria-label="Benchmark Hospital – back to the start"
           onClick={(e) => {
             // Already on the single page: tell the flow to go back to the start screen instead of reloading

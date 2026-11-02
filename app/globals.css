@@ -2,7 +2,7 @@
 
 /*
  * Base palette: black, blue, green, white.
- * The whole interface is dark: black glass panels over the video, white text, blue and green accents.
+ * The whole interface is dark: solid black panels over the video, white text, blue and green accents.
  * Data colours (charts, capacity status yellow/red, series) live in components/charts/theme.ts
  * and lib/closure/status.ts.
  */
@@ -10,7 +10,8 @@
   --color-ink: #eef2f8; /* main text (white-ish) */
   --color-muted: #9aa7ba; /* secondary text */
   --color-line: rgb(255 255 255 / 0.13); /* hairlines and borders */
-  --color-surface: rgb(8 14 26 / 0.66); /* glass panels */
+  --color-surface: #070b12; /* solid black panels (no see-through, so the video never hurts readability) */
+  --color-panel: #0c121c; /* solid, slightly lighter: controls that sit directly on the video */
   --color-page: #04070d;
   /* blue: tints for backgrounds, lighter steps for text on dark */
   --color-brand-50: rgb(43 125 233 / 0.13);
@@ -45,12 +46,6 @@ input[type="range"] { accent-color: var(--color-brand-500); }
 /* Condensed display type for titles and big figures */
 .font-display { font-family: var(--font-bebas), Impact, "Arial Narrow", sans-serif; letter-spacing: 0.02em; text-transform: uppercase; font-weight: 400; }
 
-/* Thin technical corner marks used on hero panels (echo of the blueprint video) */
-.ticks { position: relative; }
-.ticks::before, .ticks::after { content: ""; position: absolute; width: 14px; height: 14px; border: 1px solid rgba(255,255,255,.55); pointer-events: none; }
-.ticks::before { top: 0; left: 0; border-right: 0; border-bottom: 0; }
-.ticks::after { bottom: 0; right: 0; border-left: 0; border-top: 0; }
-
 @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
 .rise { animation: rise .8s cubic-bezier(.2,.7,.2,1) both; }
 
@@ -75,7 +70,12 @@ input[type="range"] { accent-color: var(--color-brand-500); }
 .stagger > *:nth-child(3) { animation-delay: .17s; } .stagger > *:nth-child(4) { animation-delay: .24s; }
 .stagger > *:nth-child(5) { animation-delay: .31s; } .stagger > *:nth-child(n+6) { animation-delay: .38s; }
 
-/* Glass cards: lift and glow on hover */
+/* Solid tinted banners (status colour over solid black, never see-through) */
+.solid-par { background: linear-gradient(rgb(18 163 122 / .16), rgb(18 163 122 / .16)), #070b12; }
+.solid-watch { background: linear-gradient(rgb(232 146 15 / .16), rgb(232 146 15 / .16)), #070b12; }
+.solid-gap { background: linear-gradient(rgb(229 72 77 / .16), rgb(229 72 77 / .16)), #070b12; }
+
+/* Cards: lift and glow on hover */
 .glass { transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease; }
 .glass:hover { transform: translateY(-2px); border-color: rgb(90 159 255 / .45); box-shadow: 0 1px 0 rgb(255 255 255 / .06) inset, 0 22px 44px -22px rgb(43 125 233 / .5); }
 

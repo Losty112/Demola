@@ -9,7 +9,7 @@ const BAR: Record<"good" | "warn" | "bad", string> = { good: "bg-par", warn: "bg
 
 function KpiCard({ title, value, tone, children }: { title: string; value: string; tone: "good" | "warn" | "bad"; children: React.ReactNode }) {
   return (
-    <article className="glass flex flex-col rounded-2xl border border-line bg-gradient-to-b from-white/10 to-white/[0.02] p-5 shadow-card backdrop-blur">
+    <article className="glass flex flex-col rounded-2xl border border-line bg-gradient-to-b from-[#131c2b] to-[#0a0f18] p-5 shadow-card">
       <h4 className="text-xs font-semibold uppercase tracking-wide text-muted">{title}</h4>
       <p className={`mt-2 font-display text-4xl leading-none tabular-nums ${TONE[tone]}`}><AnimatedValue text={value} /></p>
       <div className="mt-3 space-y-2 text-sm text-muted">{children}</div>
@@ -97,7 +97,7 @@ export function KpiSummary({ wards, result }: { wards: Ward[]; result: ScenarioR
     </div>
 
     {/* Compact strip with the five headline numbers (admissions per year) */}
-    <dl className="stagger grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-line bg-line sm:grid-cols-5">
+    <dl className="stagger grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-line bg-[#1c2636] sm:grid-cols-5">
       {stats.map((x) => (
         <div key={x.label} className="bg-surface px-4 py-3">
           <dt className="text-xs text-muted">{x.label}</dt>
