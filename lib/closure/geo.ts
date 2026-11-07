@@ -27,6 +27,11 @@ export function tilesCovering(box: { north: number; south: number; west: number;
   return out;
 }
 
-/** Dark basemap (OpenStreetMap data, CARTO style). Retina (@2x) tiles. Attribution: see MAP_ATTRIBUTION. */
-export const tileUrl = (t: Pick<Tile, "x" | "y" | "z">) => `https://${"abc"[(t.x + t.y) % 3]}.basemaps.cartocdn.com/dark_all/${t.z}/${t.x}/${t.y}@2x.png`;
-export const MAP_ATTRIBUTION = "© OpenStreetMap contributors © CARTO";
+/**
+ * Basemap: standard OpenStreetMap tiles (CARTO's free dark tiles now answer "API key required").
+ * They are light, so maps draw them through TILE_FILTER to get a dark street map. Fine for a prototype;
+ * for production use a tile provider with a key (OSM's tile usage policy).
+ */
+export const tileUrl = (t: Pick<Tile, "x" | "y" | "z">) => `https://tile.openstreetmap.org/${t.z}/${t.x}/${t.y}.png`;
+export const TILE_FILTER = "invert(1) hue-rotate(180deg) brightness(0.85) contrast(0.9) saturate(0.4)";
+export const MAP_ATTRIBUTION = "© OpenStreetMap contributors";
