@@ -1,5 +1,5 @@
 import { connection } from "next/server";
-import { fetchAll, getSupabase, unwrap } from "./client";
+import { fetchAll, getSupabase, isSupabaseConfigured, unwrap } from "./client";
 import { DEFAULT_BENCHMARK, DEFAULT_SETTINGS, SCORED_KEYS } from "../domain/metrics";
 import { analyse } from "../domain/scoring";
 import { recommend } from "../domain/recommendation";
@@ -46,8 +46,27 @@ export async function getSettings(): Promise<Settings> {
 
 export async function getDataOrigin(): Promise<"demo" | "imported"> {
   await connection();
+  if (!isSupabaseConfigured()) return "demo";
   const row = unwrap(await getSupabase().from("meta").select("value").eq("key", "data_origin").maybeSingle(), "reading data origin") as { value: string } | null;
   return row?.value === "demo" ? "demo" : "imported";
+}
+
+export interface Reference {
+  benchmark: Benchmark;
+  settings: Settings;
+  sources: Record<string, string>;
+  origin: "demo" | "imported";
+}
+
+/**
+ * Benchmark values, decision rules and their sources for the director pages. Reads the database when it is
+ * configured; otherwise (local preview without keys) uses the built-in placeholder values.
+ */
+export async function getReference(): Promise<Reference> {
+  await connection();
+  if (!isSupabaseConfigured()) return { benchmark: { ...DEFAULT_BENCHMARK }, settings: { ...DEFAULT_SETTINGS }, sources: {}, origin: "demo" };
+  const [benchmark, settings, sources, origin] = await Promise.all([getBenchmark(), getSettings(), getBenchmarkSources(), getDataOrigin()]);
+  return { benchmark, settings, sources, origin };
 }
 
 async function loadSites(slug?: string): Promise<SiteWithHistory[]> {

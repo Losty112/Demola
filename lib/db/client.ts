@@ -4,6 +4,10 @@ declare global {
   var __supabase: SupabaseClient | undefined;
 }
 
+/** True when the Supabase keys are set. Without them the director pages fall back to the built-in benchmark values. */
+export const isSupabaseConfigured = () =>
+  !!(process.env.SUPABASE_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL) && !!process.env.SUPABASE_SERVICE_ROLE_KEY;
+
 /**
  * Server-side Supabase client (service-role key, bypasses RLS). Never import this from a client component:
  * the key must not reach the browser. Vercel's Supabase integration sets both variables automatically.

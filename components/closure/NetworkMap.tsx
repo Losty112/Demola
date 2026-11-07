@@ -1,6 +1,6 @@
 "use client";
 import { useMemo } from "react";
-import { MAP_ATTRIBUTION, tileUrl, tilesCovering, zoomFor } from "@/lib/closure/geo";
+import { MAP_ATTRIBUTION, TILE_FILTER, tileUrl, tilesCovering, zoomFor } from "@/lib/closure/geo";
 import type { ScenarioResult, Ward } from "@/lib/closure/types";
 import { STATUS_META, capacityStatus } from "@/lib/closure/status";
 import { formatInt } from "@/lib/format";
@@ -8,6 +8,8 @@ import { FOCUS } from "./ui";
 
 export type MapView = "baseline" | "after";
 
+/** Rounded to 0.1 px: Node and the browser differ in the last float digits, which would break hydration. */
+const px = (v: number) => Math.round(v * 10) / 10;
 const W = 640;
 const H = 440;
 const PAD = 26;
@@ -79,7 +81,7 @@ export function NetworkMap({ wards, result, view, focusId, onFocus, onSelect, se
         <rect width={W} height={H} fill="#07101f" />
         {tiles.map((t) => {
           const [x0, y0] = project(t.north, t.west), [x1, y1] = project(t.south, t.east);
-          return <image key={`${t.z}/${t.x}/${t.y}`} href={tileUrl(t)} x={x0} y={y0} width={x1 - x0 + 0.6} height={y1 - y0 + 0.6} preserveAspectRatio="none" opacity={0.9} />;
+          return <image key={`${t.z}/${t.x}/${t.y}`} href={tileUrl(t)} x={px(x0)} y={px(y0)} width={px(x1 - x0 + 0.6)} height={px(y1 - y0 + 0.6)} preserveAspectRatio="none" opacity={0.9} style={{ filter: TILE_FILTER }} />;
         })}
         <rect width={W} height={H} fill="#04070d" opacity={0.28} />
         <text x={W - 8} y={H - 7} textAnchor="end" fontSize={9} fill="#9aa7ba">{MAP_ATTRIBUTION}</text>
