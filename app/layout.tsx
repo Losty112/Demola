@@ -18,10 +18,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const origin = await getDataOrigin();
   return (
     <html lang="en" className={`${inter.variable} ${bebas.variable}`}>
-      <body className="min-h-screen antialiased">
+      <body className="flex min-h-screen flex-col antialiased">
         <TopNav demo={origin === "demo"} />
         {/* Full width: the page flow (hero or analysis sheet) sets its own container */}
-        <main>{children}</main>
+        <main className="flex-1">{children}</main>
         <Footer demo={origin === "demo"} />
       </body>
     </html>

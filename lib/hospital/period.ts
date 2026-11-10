@@ -17,6 +17,18 @@ export function monthLabel(month: string): string {
   return `${MONTH_NAMES[m - 1]} ${String(y).slice(2)}`;
 }
 
+/** "2026-01" -> "Jan 2026" (fixed names: the browser would write "Sept" for September) */
+export function monthYearLabel(month: string): string {
+  const [y, m] = month.split("-").map(Number);
+  return `${MONTH_NAMES[m - 1]} ${y}`;
+}
+
+/** "2026-11-03" or "2026-11-03T10:00:00Z" -> "3 Nov 2026"; anything else is returned unchanged. */
+export function dateLabel(iso: string): string {
+  const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(iso);
+  return m ? `${Number(m[3])} ${MONTH_NAMES[Number(m[2]) - 1]} ${m[1]}` : iso;
+}
+
 /** Calendar month index 0..11 of "2026-01" (for seasonal profiles). */
 export const monthIndex = (month: string) => Number(month.slice(5, 7)) - 1;
 

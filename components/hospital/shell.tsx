@@ -5,7 +5,7 @@ import { BackgroundVideo } from "@/components/flow/BackgroundVideo";
 import { Card } from "@/components/ui/Card";
 import { Icon, type IconName } from "@/components/ui/Icon";
 import { DATASET_BY_ID, type DatasetId } from "@/lib/hospital/datasets";
-import { PERIOD_LABEL } from "@/lib/hospital/period";
+import { PERIOD_LABEL, dateLabel } from "@/lib/hospital/period";
 import { actions, useHospital, type HospitalState } from "@/lib/hospital/store";
 import { INPUT } from "@/components/flow/fields";
 
@@ -109,10 +109,7 @@ export function Supplied({ id, s }: { id: DatasetId; s: HospitalState }) {
   );
 }
 
-export const formatDate = (iso: string) => {
-  const d = new Date(iso);
-  return Number.isNaN(d.getTime()) ? iso : d.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
-};
+export const formatDate = dateLabel;
 
 /** Big figure with an icon instead of a bare number in a table. */
 export function Figure({ icon, label, value, hint, tone = "brand" }: { icon: IconName; label: string; value: string; hint?: ReactNode; tone?: "brand" | "good" | "warn" | "bad" }) {
