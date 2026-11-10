@@ -68,3 +68,13 @@ test("derived view without uploads: nothing invented", () => {
   assert.equal(v.totals.beds, null);
   assert.deepEqual(v.snapshotNeeds, ["wards", "patients", "costs", "energy", "building"]);
 });
+
+import { dateLabel, monthYearLabel } from "../lib/hospital/period";
+
+test("month and date labels use fixed names (never \"Sept\")", () => {
+  assert.equal(monthYearLabel("2026-09"), "Sep 2026");
+  assert.equal(monthYearLabel("2025-11"), "Nov 2025");
+  assert.equal(dateLabel("2026-09-05"), "5 Sep 2026");
+  assert.equal(dateLabel("2026-11-03T10:15:00.000Z"), "3 Nov 2026");
+  assert.equal(dateLabel("not a date"), "not a date");
+});

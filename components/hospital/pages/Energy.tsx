@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Card } from "@/components/ui/Card";
 import { Icon } from "@/components/ui/Icon";
 import { formatInt } from "@/lib/format";
-import { DAYS_IN_PERIOD, daysInMonth } from "@/lib/hospital/period";
+import { DAYS_IN_PERIOD, daysInMonth, monthYearLabel } from "@/lib/hospital/period";
 import type { Reference } from "@/lib/db/repository";
 import { MonthlyBars } from "../charts";
 import { Figure, NeedsData, PageShell, RequireProfile, formatDate } from "../shell";
@@ -68,7 +68,7 @@ export function Energy({ reference }: { reference: Reference }) {
                       <tbody>
                         {v.months.map((m) => (
                           <tr key={m.month} className="border-t border-line">
-                            <td className="py-1.5">{new Date(`${m.month}-01`).toLocaleDateString("en-GB", { month: "short", year: "numeric" })}</td>
+                            <td className="py-1.5">{monthYearLabel(m.month)}</td>
                             {KINDS.map((x) => {
                               const val = m[x.key];
                               const pb = val === null ? null : (val * x.scale) / (beds * daysInMonth(m.month));
