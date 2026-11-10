@@ -1,5 +1,5 @@
 import { connection } from "next/server";
-import { fetchAll, getSupabase, unwrap } from "./client";
+import { fetchAll, getSupabase, isSupabaseConfigured, unwrap } from "./client";
 import { DEFAULT_BENCHMARK, DEFAULT_SETTINGS, SCORED_KEYS } from "../domain/metrics";
 import { analyse } from "../domain/scoring";
 import { recommend } from "../domain/recommendation";
@@ -46,8 +46,27 @@ export async function getSettings(): Promise<Settings> {
 
 export async function getDataOrigin(): Promise<"demo" | "imported"> {
   await connection();
+  if (!isSupabaseConfigured()) return "demo";
   const row = unwrap(await getSupabase().from("meta").select("value").eq("key", "data_origin").maybeSingle(), "reading data origin") as { value: string } | null;
   return row?.value === "demo" ? "demo" : "imported";
+}
+
+export interface Reference {
+  benchmark: Benchmark;
+  settings: Settings;
+  sources: Record<string, string>;
+  origin: "demo" | "imported";
+}
+
+/**
+ * Benchmark values, decision rules and their sources for the director pages. Reads the database when it is
+ * configured; otherwise (local preview without keys) uses the built-in placeholder values.
+ */
+export async function getReference(): Promise<Reference> {
+  await connection();
+  if (!isSupabaseConfigured()) return { benchmark: { ...DEFAULT_BENCHMARK }, settings: { ...DEFAULT_SETTINGS }, sources: {}, origin: "demo" };
+  const [benchmark, settings, sources, origin] = await Promise.all([getBenchmark(), getSettings(), getBenchmarkSources(), getDataOrigin()]);
+  return { benchmark, settings, sources, origin };
 }
 
 async function loadSites(slug?: string): Promise<SiteWithHistory[]> {
@@ -105,30 +124,6 @@ export async function getNetwork(scenario: ScenarioInput = DEFAULT_SCENARIO): Pr
   });
   const periods = [...new Set(sites.flatMap((s) => s.history.map((h) => h.period)))].sort();
   return { sites: enriched, benchmark, settings, periods };
-}
-
-export interface SiteInput { name: string; region?: string; kind?: string; snapshot: Snapshot }
-
-/** Upserts one site and one period of data entered by a user (same shape the CSV import writes). */
-export async function saveSiteSnapshot(input: SiteInput): Promise<string> {
-  const db = getSupabase();
-  const slug = input.name.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "site";
-  const s = input.snapshot;
-  const site = unwrap(
-    await db.from("sites")
-      .upsert({ slug, name: input.name.trim(), region: input.region?.trim() || "—", kind: input.kind?.trim() || "Hospital" }, { onConflict: "slug" })
-      .select("id").single(),
-    "saving site",
-  ) as { id: number };
-  unwrap(
-    await db.from("site_snapshots").upsert({
-      site_id: site.id, period: s.period, beds: s.beds, occupancy: s.occupancy, area_per_bed: s.areaPerBed, cost_per_m2: s.costPerM2,
-      or_util: s.orUtil, space_use: s.spaceUse, energy: s.energy, travel_time: s.travelTime, source: "form", imported_at: new Date().toISOString(),
-    }, { onConflict: "site_id,period" }).select("id"),
-    "saving snapshot",
-  );
-  unwrap(await db.from("meta").upsert({ key: "data_origin", value: "imported" }, { onConflict: "key" }).select("key"), "saving data origin");
-  return slug;
 }
 
 /** Departments, monthly activity, operating rooms, cost split and patient catchment of one site. */
