@@ -68,9 +68,6 @@ export function HospitalMap({ points, selectedId, onSelect, title, maxSize }: {
         const [x, y] = project(p.lat, p.lon);
         const rr = r(p.size);
         const sel = selectedId === p.id;
-        const left = x > W * 0.68;
-        const tx = left ? x - rr - 6 : x + rr + 6;
-        const anchor = left ? "end" : "start";
         return (
           <g key={p.id} role="button" tabIndex={0} aria-pressed={sel} aria-label={`${p.label}: ${p.detail}`} className="cursor-pointer outline-none"
             onClick={() => onSelect(sel ? null : p.id)}
@@ -81,8 +78,25 @@ export function HospitalMap({ points, selectedId, onSelect, title, maxSize }: {
               ? <circle cx={x} cy={y} r={rr} fill="#04070d" stroke="#9aa7ba" strokeWidth={1.5} strokeDasharray="3 2" />
               : <circle cx={x} cy={y} r={rr} fill={p.color} fillOpacity={0.9} stroke={p.own ? "#ffffff" : "#04070d"} strokeWidth={p.own ? 3 : 1.5} style={{ transition: "r .5s ease, fill .5s ease" }} />}
             <text x={x} y={y + 4} textAnchor="middle" fontSize={11} fontWeight={800} fill="#fff" pointerEvents="none" style={{ paintOrder: "stroke", stroke: "#04070d", strokeWidth: 2.5 }}>{p.own ? "★" : p.short ?? ""}</text>
-            {(sel || p.own) && <text x={tx} y={y + 4} textAnchor={anchor} fontSize={12} fontWeight={700} fill="#fff" pointerEvents="none" style={{ paintOrder: "stroke", stroke: "#04070d", strokeWidth: 3.5 }}>{p.own ? "Your hospital" : p.label}</text>}
-            {sel && <text x={tx} y={y + 19} textAnchor={anchor} fontSize={10.5} fill="#c9d3e3" pointerEvents="none" style={{ paintOrder: "stroke", stroke: "#04070d", strokeWidth: 3.5 }}>{p.detail}</text>}
+          </g>
+        );
+      })}
+      {/* Labels in a second pass so no circle ever covers a name. The own hospital's name sits above its marker. */}
+      {points.map((p) => {
+        const sel = selectedId === p.id;
+        if (!sel && !p.own) return null;
+        const [x, y] = project(p.lat, p.lon);
+        const rr = r(p.size);
+        const left = x > W * 0.68;
+        const tx = left ? x - rr - 6 : x + rr + 6;
+        const anchor = left ? "end" : "start";
+        const halo = { paintOrder: "stroke", stroke: "#04070d", strokeWidth: 3.5 } as const;
+        return (
+          <g key={`label-${p.id}`} pointerEvents="none">
+            {sel
+              ? <text x={tx} y={y + 4} textAnchor={anchor} fontSize={12} fontWeight={700} fill="#fff" style={halo}>{p.own ? "Your hospital" : p.label}</text>
+              : <text x={x} y={y - rr - 9} textAnchor="middle" fontSize={12} fontWeight={700} fill="#fff" style={halo}>Your hospital</text>}
+            {sel && <text x={tx} y={y + 19} textAnchor={anchor} fontSize={10.5} fill="#c9d3e3" style={halo}>{p.detail}</text>}
           </g>
         );
       })}

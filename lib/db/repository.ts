@@ -126,30 +126,6 @@ export async function getNetwork(scenario: ScenarioInput = DEFAULT_SCENARIO): Pr
   return { sites: enriched, benchmark, settings, periods };
 }
 
-export interface SiteInput { name: string; region?: string; kind?: string; snapshot: Snapshot }
-
-/** Upserts one site and one period of data entered by a user (same shape the CSV import writes). */
-export async function saveSiteSnapshot(input: SiteInput): Promise<string> {
-  const db = getSupabase();
-  const slug = input.name.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "site";
-  const s = input.snapshot;
-  const site = unwrap(
-    await db.from("sites")
-      .upsert({ slug, name: input.name.trim(), region: input.region?.trim() || "—", kind: input.kind?.trim() || "Hospital" }, { onConflict: "slug" })
-      .select("id").single(),
-    "saving site",
-  ) as { id: number };
-  unwrap(
-    await db.from("site_snapshots").upsert({
-      site_id: site.id, period: s.period, beds: s.beds, occupancy: s.occupancy, area_per_bed: s.areaPerBed, cost_per_m2: s.costPerM2,
-      or_util: s.orUtil, space_use: s.spaceUse, energy: s.energy, travel_time: s.travelTime, source: "form", imported_at: new Date().toISOString(),
-    }, { onConflict: "site_id,period" }).select("id"),
-    "saving snapshot",
-  );
-  unwrap(await db.from("meta").upsert({ key: "data_origin", value: "imported" }, { onConflict: "key" }).select("key"), "saving data origin");
-  return slug;
-}
-
 /** Departments, monthly activity, operating rooms, cost split and patient catchment of one site. */
 export async function getSiteStats(slug: string): Promise<SiteStats | null> {
   await connection();
